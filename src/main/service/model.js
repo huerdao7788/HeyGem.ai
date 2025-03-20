@@ -8,7 +8,10 @@ import { train as trainVoice } from './voice.js'
 import { assetPath } from '../config/config.js'
 import log from '../logger.js'
 import { extractAudio } from '../util/ffmpeg.js'
+import { uploadFile } from '../api/file'
+
 const MODEL_NAME = 'model'
+import FormData from 'form-data'
 
 /**
  * 新增模特
@@ -16,7 +19,7 @@ const MODEL_NAME = 'model'
  * @param {string} videoPath 模特视频路径
  * @returns
  */
-function addModel(modelName, videoPath) {
+async function addModel(modelName, videoPath) {
   if (!fs.existsSync(assetPath.model)) {
     fs.mkdirSync(assetPath.model, {
       recursive: true
@@ -27,7 +30,7 @@ function addModel(modelName, videoPath) {
   const modelFileName = dayjs().format('YYYYMMDDHHmmssSSS') + extname
   const modelPath = path.join(assetPath.model, modelFileName)
 
-  fs.copyFileSync(videoPath, modelPath)
+  await fs.copyFileSync(videoPath, modelPath)
 
   // 用ffmpeg分离音频
   if (!fs.existsSync(assetPath.ttsTrain)) {
@@ -35,25 +38,41 @@ function addModel(modelName, videoPath) {
       recursive: true
     })
   }
-  const audioPath = path.join(assetPath.ttsTrain, modelFileName.replace(extname, '.wav'))
-  return extractAudio(modelPath, audioPath).then(() => {
-    // 训练语音模型
-    const relativeAudioPath = path.relative(assetPath.ttsRoot, audioPath)
-    if (process.env.NODE_ENV === 'development') {
-      // TODO 写死调试
-      return trainVoice('origin_audio/test.wav', 'zh')
-    } else {
-      return trainVoice(relativeAudioPath, 'zh')
-    }
-  }).then((voiceId)=>{
-    // 插入模特信息
-    const relativeModelPath = path.relative(assetPath.model, modelPath)
-    const relativeAudioPath = path.relative(assetPath.ttsRoot, audioPath)
 
-    // insert model info to db
-    const id = insert({ modelName, videoPath: relativeModelPath, audioPath: relativeAudioPath, voiceId })
-    return id
-  })
+  // TODO 同步音频和视频到服务端
+  let videoBuffer = fs.readFileSync(videoPath)
+  await uploadFile({ file: videoBuffer.toString('base64'), path: videoPath, fileType: 'video' })
+
+  const audioPath = path.join(assetPath.ttsTrain, modelFileName.replace(extname, '.wav'))
+  let audioBuffer = await fs.readFileSync(audioPath)
+  await uploadFile({ file: audioBuffer.toString('base64'), path: audioPath, fileType: 'audio' })
+
+  return extractAudio(modelPath, audioPath)
+    .then(() => {
+      // 训练语音模型
+      const relativeAudioPath = path.relative(assetPath.ttsRoot, audioPath)
+      // if (process.env.NODE_ENV === 'development') {
+      //   // TODO 写死调试
+      //   return trainVoice('origin_audio/test.wav', 'zh')
+      // } else {
+      //   return trainVoice(relativeAudioPath, 'zh')
+      // }
+      return trainVoice(relativeAudioPath, 'zh')
+    })
+    .then((voiceId) => {
+      // 插入模特信息
+      const relativeModelPath = path.relative(assetPath.model, modelPath)
+      const relativeAudioPath = path.relative(assetPath.ttsRoot, audioPath)
+
+      // insert model info to db
+      const id = insert({
+        modelName,
+        videoPath: relativeModelPath,
+        audioPath: relativeAudioPath,
+        voiceId
+      })
+      return id
+    })
 }
 
 function page({ page, pageSize, name = '' }) {
@@ -82,13 +101,13 @@ function removeModel(modelId) {
   log.debug('~ removeModel ~ modelId:', modelId)
 
   // 删除视频
-  const videoPath = path.join(assetPath.model, model.video_path ||'')
+  const videoPath = path.join(assetPath.model, model.video_path || '')
   if (!isEmpty(model.video_path) && fs.existsSync(videoPath)) {
     fs.unlinkSync(videoPath)
   }
 
   // 删除音频
-  const audioPath = path.join(assetPath.ttsRoot, model.audio_path ||'')
+  const audioPath = path.join(assetPath.ttsRoot, model.audio_path || '')
   if (!isEmpty(model.audio_path) && fs.existsSync(audioPath)) {
     fs.unlinkSync(audioPath)
   }
