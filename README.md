@@ -1,5 +1,13 @@
 # Heygem - Open Source Alternative to Heygen [【切换中文】](./README_zh.md)
 
+## Version Update Notice
+
+**The Lite version is officially released, you can download it [here](https://github.com/GuijiAI/HeyGem.ai/releases)**
+
+1. The Lite version can reduce two services heygem-tts / heygem-asr, reducing the installation size from 70G to 13.5G
+2. The Lite version has faster custom image and video generation
+3. The Lite version does not have the text-to-video function, it can only generate videos by uploading audio
+
 ## Important Notice to Developer Partners
 
 **Dear Heygem Open Source Community Members:**
@@ -168,7 +176,7 @@ Heygem is a fully offline video synthesis tool designed for Windows systems that
 Installation using Docker, docker-compose as follows:
 
 1. The `docker-compose.yml` file is in the `/deploy` directory.
-2. Execute `docker-compose up -d` in the `/deploy` directory
+2. Execute `docker-compose up -d` in the `/deploy` directory, <u>if you want to use the lite version, execute `docker-compose -f docker-compose-lite.yml up -d`</u>
 3. Wait patiently (about half an hour, speed depends on network), download will consume about 70GB of traffic, make sure to use WiFi
 4. When you see three services in Docker, it indicates success
 

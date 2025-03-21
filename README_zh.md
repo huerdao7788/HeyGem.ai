@@ -1,5 +1,13 @@
 # Heygem - Heygen的开源平替产品 [【Switch to English】](./README.md)
 
+## 【版本更新通知】
+
+**Lite版本正式发布，可以前往[这里](https://github.com/GuijiAI/HeyGem.ai/releases)下载**
+
+1. Lite 版可以减少两个服务 heygem-tts / heygem-asr，安装体积从70G减小到13.5G
+2. Lite 版订制形象和视频生成都更快
+3. Lite 版没有文字生成视频功能，只能用上传音频的方式生成视频
+
 ## 【致开发者伙伴的重要通知】
 
 **亲爱的Heygem开源社区成员：**
@@ -82,6 +90,7 @@
 ## 介绍
 
 <img src="README_zh.assets/image-20250304114114272.png">
+
 Heygem是一款专为Windows系统设计的全离线视频合成工具，它能够精确克隆您的外貌和声音，让您的形象数字化。您可以通过文字和语音驱动虚拟形象，进行视频制作。无需联网，保护隐私的同时，也能享受到便捷和高效的数字体验。
 
 - 核心功能
@@ -168,7 +177,7 @@ Heygem是一款专为Windows系统设计的全离线视频合成工具，它能�
 采用Docker方式安装，docker-compose如下：
 
 1. `docker-compose.yml`文件在`/deploy`目录下。
-2. 在`/deploy`目录执行`docker-compose up -d`
+2. 在`/deploy`目录执行`docker-compose up -d`，<u>如果您想使用lite版本，请执行`docker-compose -f docker-compose-lite.yml up -d`</u>
 3. 耐心等待一段时间（半小时左右，速度取决于网速），下载会消耗70G左右流量，注意连WIFI
 4. 看到Dokcer 中出现三个服务，表示成功了
 
