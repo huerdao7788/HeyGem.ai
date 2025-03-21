@@ -2,11 +2,13 @@
   <div class="preview">
     <div class="preview-header">{{ $t('common.preview.headerText') }}</div>
     <div class="preview-body">
-      <video v-if="model.video_path" class="video" controls :src="model.video_path"></video>
+      <video v-if="model.video_path" class="video" controls :src="handlePath(model.video_path)"></video>
     </div>
   </div>
 </template>
 <script setup>
+import { handlePath } from '@renderer/utils'
+
 defineProps({
   model: {
     type: Object,

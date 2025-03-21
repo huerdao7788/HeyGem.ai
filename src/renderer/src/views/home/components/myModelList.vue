@@ -41,7 +41,7 @@
           <div class="img-video comme">
             <div class="img-video-content">
               <div class="duration" style="display: none">00:30</div>
-              <video class="model-video" :src="item.video_path"></video>
+              <video class="model-video" :src="handlePath(item.video_path)"></video>
               <div class="fail" style="display: none">
                 <div class="fail-line"></div>
                 <span> {{ $t('common.myModelList.inProgressText') }}</span>
@@ -107,7 +107,7 @@
 import { reactive, onMounted, ref } from 'vue'
 import { DeleteIcon } from 'tdesign-icons-vue-next'
 import { modelPage, removeModel } from '@renderer/api/index.js'
-import { formatDate } from '@renderer/utils/index.js'
+import { formatDate, handlePath } from '@renderer/utils/index.js'
 import { useRouter } from 'vue-router'
 import VideoDialog from '@renderer/views/home/components/videoDialog.vue'
 import DeleteDialog from '@renderer/components/deleteDialog.vue'

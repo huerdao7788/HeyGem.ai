@@ -27,7 +27,7 @@ import { CloseIcon } from 'tdesign-icons-vue-next'
 import PlayIcon from '@renderer/assets/images/icons/icon-play.png'
 import PauseIcon from '@renderer/assets/images/icons/icon-pause.png'
 import { cloneDeep } from 'lodash-es';
-import { millisecondsToTime } from '@renderer/utils/index.js'
+import { handlePath, millisecondsToTime } from '@renderer/utils/index.js'
 
 const AUDIO_STATUS = {
   UNPLAY: 0,
@@ -113,7 +113,7 @@ const action = {
 
   play(audioUrl) {
     if (audioUrl && audioUrl !== state.audioUrl) {
-      audio.src = audioUrl
+      audio.src = handlePath(audioUrl)
       state.audioUrl = audioUrl
     }
     audio.play()

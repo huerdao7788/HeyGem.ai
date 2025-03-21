@@ -33,7 +33,7 @@
                 {{ item.duration + '' ? millisecondsToTime(item.duration * 1000) : '00:00' }}
               </div>
               <div v-if="item.status === 'success'" class="works-video">
-                <video :src="item.file_path"></video>
+                <video :src="handlePath(item.file_path)"></video>
               </div>
               <!--  <video class="works-video" src="../../../assets/images/home/aa.mp4"></video> -->
               <img
@@ -158,7 +158,7 @@
 import { reactive, onMounted, onBeforeUnmount, ref } from 'vue'
 import { DeleteIcon } from 'tdesign-icons-vue-next'
 import { videoPage, exportVideo, removeVideo } from '@renderer/api/index.js'
-import { formatDate, millisecondsToTime } from '@renderer/utils/index.js'
+import { formatDate, handlePath, millisecondsToTime } from '@renderer/utils/index.js'
 import VideoDialog from '@renderer/views/home/components/videoDialog.vue'
 import { Client } from '@renderer/client'
 import { useHomeStore } from '@renderer/stores/home.js'

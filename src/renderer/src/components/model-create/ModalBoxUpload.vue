@@ -7,7 +7,7 @@
 
     <!-- 已上传 -->
     <div class="upload-box --uploaded" v-else-if="uploadInfo.videoPath" @click="action.upload">
-      <video class="video" :src="uploadInfo.videoPath" controls />
+      <video class="video" :src="handlePath(uploadInfo.videoPath)" controls />
     </div>
 
     <!-- 未上传 -->
@@ -15,8 +15,8 @@
       <t-image class="image" :src="ImageShotVideo" />
       <p class="tips">{{ $t('common.modelCreateView.tipsText') }}</p>
       <t-button class="button" @click="action.upload">
-        {{ $t('common.modelCreateView.uploadVideoText') }}</t-button
-      >
+        {{ $t('common.modelCreateView.uploadVideoText') }}
+      </t-button>
     </div>
   </div>
 </template>
@@ -26,8 +26,9 @@ import ImageShotVideo from '@renderer/assets/images/create-model/image-shot.png'
 import { Client } from '@renderer/client'
 import { MessagePlugin } from 'tdesign-vue-next'
 
-
 import { useI18n } from 'vue-i18n'
+import { handlePath } from '@renderer/utils'
+
 const { t } = useI18n()
 const uploadInfo = defineModel()
 

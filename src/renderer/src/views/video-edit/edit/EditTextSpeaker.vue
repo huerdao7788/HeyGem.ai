@@ -26,6 +26,7 @@ import PlayIcon from '@renderer/assets/images/icons/icon-play.png'
 import PauseIcon from '@renderer/assets/images/icons/icon-pause.png'
 import { modelPage } from '@renderer/api'
 import { MessagePlugin } from 'tdesign-vue-next'
+import { handlePath } from '@renderer/utils'
 
 const select = defineModel({})
 
@@ -105,7 +106,7 @@ const action = {
     state.playingId = ''
   },
   playAudio(speaker) {
-    audio.src = speaker.audio_path
+    audio.src = handlePath(speaker.audio_path)
     state.playingId = speaker.id
     audio.play()
   },

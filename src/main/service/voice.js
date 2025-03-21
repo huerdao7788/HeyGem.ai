@@ -7,6 +7,7 @@ import { assetPath } from '../config/config.js'
 import log from '../logger.js'
 import { ipcMain } from 'electron'
 import dayjs from 'dayjs'
+import { uploadFile } from '../api/file'
 
 const MODEL_NAME = 'voice'
 
@@ -30,11 +31,12 @@ export async function train(path, lang = 'zh') {
   }
 }
 
-export function makeAudio4Video({voiceId, text}) {
-  return makeAudio({voiceId, text, targetDir: assetPath.ttsProduct})
+export function makeAudio4Video({ voiceId, text }) {
+  return makeAudio({ voiceId, text, targetDir: assetPath.ttsProduct })
 }
 
 export function copyAudio4Video(filePath) {
+  console.log(filePath)
   // 将filePath复制到ttsProduct目录下
   const targetDir = assetPath.ttsProduct
   const fileName = dayjs().format('YYYYMMDDHHmmssSSS') + path.extname(filePath)
@@ -43,7 +45,7 @@ export function copyAudio4Video(filePath) {
   return fileName
 }
 
-export async function makeAudio({voiceId, text, targetDir}) {
+export async function makeAudio({ voiceId, text, targetDir }) {
   const uuid = crypto.randomUUID()
   const voice = selectByID(voiceId)
 
@@ -65,7 +67,7 @@ export async function makeAudio({voiceId, text, targetDir}) {
   })
     .then((res) => {
       if (!fs.existsSync(targetDir)) {
-        fs.mkdirSync(targetDir, {  
+        fs.mkdirSync(targetDir, {
           recursive: true
         })
       }
@@ -80,13 +82,13 @@ export async function makeAudio({voiceId, text, targetDir}) {
 
 /**
  * 试听音频
- * @param {string} voiceId 
- * @param {string} text 
- * @returns 
+ * @param {string} voiceId
+ * @param {string} text
+ * @returns
  */
 export async function audition(voiceId, text) {
   const tmpDir = require('os').tmpdir()
-  console.log("🚀 ~ audition ~ tmpDir:", tmpDir)
+  console.log('🚀 ~ audition ~ tmpDir:', tmpDir)
   const audioPath = await makeAudio({ voiceId, text, targetDir: tmpDir })
   return path.join(tmpDir, audioPath)
 }

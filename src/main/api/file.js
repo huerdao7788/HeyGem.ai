@@ -8,3 +8,9 @@ export const uploadFile = async (param) => {
     }
   })
 }
+
+export const downloadFile = async (param) => {
+  return request.post(`${serviceUrl.fileService}/v1/download`, param,  {
+    responseType: 'arraybuffer'
+  })
+}

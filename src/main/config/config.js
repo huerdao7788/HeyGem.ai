@@ -1,16 +1,15 @@
-import path from 'path'
-
-const isDev = process.env.NODE_ENV === 'development'
+import dotenv from 'dotenv';
+dotenv.config();
 
 export const serviceUrl = {
-  face2face: isDev ? 'http://10.8.5.210:8383/easy' : 'http://10.8.5.210:8383/easy',
-  tts: isDev ? 'http://10.8.5.210:18180' : 'http://10.8.5.210:18180',
-  fileService: isDev ? 'http://127.0.0.1:8000' : 'http://10.8.5.210:8000'
+  face2face: process.env.FACE_API,
+  tts: process.env.TTS_API,
+  fileService: process.env.FILE_API
 }
 
 export const assetPath = {
-  model: path.join('D:', 'heygem_data', 'face2face', 'temp'), // 模特视频
-  ttsProduct: path.join('D:', 'heygem_data', 'face2face', 'temp'), // TTS 产物
-  ttsRoot: path.join('D:', 'heygem_data', 'voice', 'data'), // TTS服务根目录
-  ttsTrain: path.join('D:', 'heygem_data', 'voice', 'data', 'origin_audio') // TTS 训练产物
+  model: process.env.MODEL_PATH, // 模特视频
+  ttsProduct: process.env.TTS_PRODUCT_PATH, // TTS 产物
+  ttsRoot: process.env.TTS_ROOT_PATH, // TTS服务根目录
+  ttsTrain: process.env.TTS_TRAIN_PATH // TTS 训练产物
 }

@@ -29,6 +29,10 @@ export const formatDate = (time = new Date(), pattern = 'YYYY-MM-DD HH:mm:ss') =
   return dayjs(time).format(pattern)
 }
 
+export const handlePath = (path) => {
+  return path.startsWith('/') ? 'file://' + path : path
+}
+
 export const millisecondsToTime = (milliseconds) => {
   const totalSeconds = Math.floor(milliseconds / 1000);
   const hours = Math.floor(totalSeconds / 3600);

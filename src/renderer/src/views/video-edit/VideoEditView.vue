@@ -202,7 +202,7 @@ const action = {
   },
   async make(videoId) {
     const makeId = await makeVideo(videoId)
-    return makeId == videoId
+    return makeId === videoId
   }
 }
 

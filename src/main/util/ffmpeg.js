@@ -1,34 +1,6 @@
 import ffmpeg from 'fluent-ffmpeg'
-import path from 'path'
 import log from '../logger.js'
 
-const ffmpegPathValue =
-  process.env.NODE_ENV === 'development'
-    ? path.join(__dirname, '../../resources/ffmpeg/bin/ffmpeg.exe')
-    : path.join(
-        process.resourcesPath,
-        'app.asar.unpacked',
-        'resources',
-        'ffmpeg',
-        'bin',
-        'ffmpeg.exe'
-      )
-log.info('FFmpeg path:', ffmpegPathValue)
-ffmpeg.setFfmpegPath(ffmpegPathValue)
-
-const ffprobePathValue =
-  process.env.NODE_ENV === 'development'
-    ? path.join(__dirname, '../../resources/ffmpeg/bin/ffprobe.exe')
-    : path.join(
-      process.resourcesPath,
-      'app.asar.unpacked',
-      'resources',
-      'ffmpeg',
-      'bin',
-      'ffprobe.exe'
-    )
-log.info('FFprobe path:', ffprobePathValue)
-ffmpeg.setFfprobePath(ffprobePathValue)
 
 export function extractAudio(videoPath, audioPath) {
   return new Promise((resolve, reject) => {

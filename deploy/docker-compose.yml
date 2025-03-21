@@ -56,9 +56,20 @@ services:
             - device_ids: ["0","1"]
               capabilities: ["gpu"]
               driver: "nvidia"
-    shm_size: '8g'
     ports:
       - '8383:8383'
     command: python /code/app_local.py
+    networks:
+      - ai_network
+  heygem-file:
+    image: registry.cn-hangzhou.aliyuncs.com/it00021hot/heygem-file:v0.0.2
+    container_name: heygem-file
+    restart: always
+    privileged: true
+    volumes:
+      - /data/models/heygem/data/face2face:/app/data/face2face
+      - /data/models/heygem/data/voice/data:/app/data/voice
+    ports:
+      - '8000:8000'
     networks:
       - ai_network

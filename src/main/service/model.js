@@ -19,7 +19,7 @@ import FormData from 'form-data'
  * @param {string} videoPath 模特视频路径
  * @returns
  */
-async function addModel(modelName, videoPath) {
+function addModel(modelName, videoPath) {
   if (!fs.existsSync(assetPath.model)) {
     fs.mkdirSync(assetPath.model, {
       recursive: true
@@ -30,7 +30,7 @@ async function addModel(modelName, videoPath) {
   const modelFileName = dayjs().format('YYYYMMDDHHmmssSSS') + extname
   const modelPath = path.join(assetPath.model, modelFileName)
 
-  await fs.copyFileSync(videoPath, modelPath)
+  fs.copyFileSync(videoPath, modelPath)
 
   // 用ffmpeg分离音频
   if (!fs.existsSync(assetPath.ttsTrain)) {
@@ -39,39 +39,40 @@ async function addModel(modelName, videoPath) {
     })
   }
 
-  // TODO 同步音频和视频到服务端
-  let videoBuffer = fs.readFileSync(videoPath)
-  await uploadFile({ file: videoBuffer.toString('base64'), path: videoPath, fileType: 'video' })
-
   const audioPath = path.join(assetPath.ttsTrain, modelFileName.replace(extname, '.wav'))
-  let audioBuffer = await fs.readFileSync(audioPath)
-  await uploadFile({ file: audioBuffer.toString('base64'), path: audioPath, fileType: 'audio' })
-
   return extractAudio(modelPath, audioPath)
     .then(() => {
       // 训练语音模型
       const relativeAudioPath = path.relative(assetPath.ttsRoot, audioPath)
-      // if (process.env.NODE_ENV === 'development') {
-      //   // TODO 写死调试
-      //   return trainVoice('origin_audio/test.wav', 'zh')
-      // } else {
-      //   return trainVoice(relativeAudioPath, 'zh')
-      // }
-      return trainVoice(relativeAudioPath, 'zh')
+      let audioBuffer = fs.readFileSync(audioPath)
+      return uploadFile({
+        file: audioBuffer.toString('base64'),
+        path: relativeAudioPath,
+        fileType: 'audio'
+      }).then((r) => {
+        return trainVoice(relativeAudioPath, 'zh')
+      })
     })
     .then((voiceId) => {
+      let videoBuffer = fs.readFileSync(videoPath)
       // 插入模特信息
       const relativeModelPath = path.relative(assetPath.model, modelPath)
-      const relativeAudioPath = path.relative(assetPath.ttsRoot, audioPath)
+      return uploadFile({
+        file: videoBuffer.toString('base64'),
+        path: 'temp/' + relativeModelPath,
+        fileType: 'video'
+      }).then((res) => {
+        const relativeAudioPath = path.relative(assetPath.ttsRoot, audioPath)
 
-      // insert model info to db
-      const id = insert({
-        modelName,
-        videoPath: relativeModelPath,
-        audioPath: relativeAudioPath,
-        voiceId
+        // insert model info to db
+        const id = insert({
+          modelName,
+          videoPath: relativeModelPath,
+          audioPath: relativeAudioPath,
+          voiceId
+        })
+        return id
       })
-      return id
     })
 }
 
