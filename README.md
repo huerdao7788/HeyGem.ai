@@ -2,11 +2,11 @@
 
 ## Version Update Notice
 
-**The Lite version is officially released, you can download it [here](https://github.com/GuijiAI/HeyGem.ai/releases)**
+**The Lite version is officially released, you can download it [here](https://github.com/GuijiAI/HeyGem.ai/releases/tag/v1.0.3-Lite). If you want to experience the standard version (original version), you can click [here](https://github.com/GuijiAI/HeyGem.ai/releases/tag/v1.0.3) to download**
 
-1. The Lite version can reduce two services heygem-tts / heygem-asr, reducing the installation size from 70G to 13.5G
-2. The Lite version has faster custom image and video generation
-3. The Lite version does not have the text-to-video function, it can only generate videos by uploading audio
+1. The Lite version can reduce two services heygem-tts / heygem-asr, reducing the installation size from 70GB to 13.5GB
+2. The Lite version customizes avatars and video generation faster
+3. The Lite version does not have text-to-video functionality, it can only generate videos by uploading audio
 
 ## Important Notice to Developer Partners
 

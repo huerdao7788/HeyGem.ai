@@ -1,8 +1,8 @@
 # Heygem - Heygen的开源平替产品 [【Switch to English】](./README.md)
 
-## 【版本更新通知】
+## 【新增Lite版本通知】
 
-**Lite版本正式发布，可以前往[这里](https://github.com/GuijiAI/HeyGem.ai/releases)下载**
+**Lite版本正式发布，可以前往[这里](https://github.com/GuijiAI/HeyGem.ai/releases/tag/v1.0.3-Lite)下载，想体验标准版本（原版本），可以点击[这里](https://github.com/GuijiAI/HeyGem.ai/releases/tag/v1.0.3)下载**
 
 1. Lite 版可以减少两个服务 heygem-tts / heygem-asr，安装体积从70G减小到13.5G
 2. Lite 版订制形象和视频生成都更快
