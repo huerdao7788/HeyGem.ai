@@ -6,6 +6,7 @@
   "author": "guiji.ai",
   "homepage": "https://heygem.ai",
   "scripts": {
+    "clean": "rimraf dist out",
     "dev": "electron-vite dev --watch",
     "start": "electron-vite preview",
     "build": "electron-vite build",
@@ -39,8 +40,6 @@
     "@rushstack/eslint-patch": "^1.10.3",
     "@vitejs/plugin-vue": "^5.0.5",
     "@vue/eslint-config-prettier": "^9.0.0",
-    "@rollup/rollup-darwin-x64": "^4.36.0",
-    "dmg-license": "^1.0.11",
     "electron": "^33.0.0",
     "electron-builder": "^24.13.3",
     "electron-vite": "^2.3.0",

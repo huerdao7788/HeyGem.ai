@@ -11,7 +11,6 @@ import { extractAudio } from '../util/ffmpeg.js'
 import { uploadFile } from '../api/file'
 
 const MODEL_NAME = 'model'
-import FormData from 'form-data'
 
 /**
  * 新增模特
