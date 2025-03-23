@@ -41,7 +41,7 @@
           <div class="img-video comme">
             <div class="img-video-content">
               <div class="duration" style="display: none">00:30</div>
-              <video class="model-video" :src="handlePath(item.video_path)"></video>
+              <video class="model-video" :src="handlePath(item.videoPath)"></video>
               <div class="fail" style="display: none">
                 <div class="fail-line"></div>
                 <span> {{ $t('common.myModelList.inProgressText') }}</span>
@@ -63,8 +63,8 @@
               <div class="delete-video" @click="delModel(item.id)">
                 <DeleteIcon style="color: #fff; font-size: 12px" />
               </div>
-              <div class="preview-box" @click="previewVideo(item.video_path)">
-                <img src="../../../assets/images/home/play.svg" />
+              <div class="preview-box" @click="previewVideo(item.videoPath)">
+                <img src="../../../assets/images/home/play.svg"  alt=""/>
                 <span>{{ $t('common.myModelList.previewText') }}</span>
               </div>
             </div>
@@ -75,7 +75,7 @@
               <div class="video-type">短视频</div>
               <div class="h1">{{ item.name }}</div>
             </div>
-            <div class="text">{{ formatDate(item.created_at) }}</div>
+            <div class="text">{{ formatDate(item.createdAt) }}</div>
           </div>
         </div>
       </div>
@@ -117,9 +117,11 @@ import { createModel } from '@renderer/components/model-create'
 import enConfig from 'tdesign-vue-next/es/locale/en_US'
 import zhConfig from 'tdesign-vue-next/es/locale/zh_CN'
 import { useI18n } from 'vue-i18n'
-const { locale,t } = useI18n()
+
+const { locale, t } = useI18n()
 
 import merge from 'lodash/merge'
+
 const globalEn = merge(enConfig, {
   pagination: {}
 })
@@ -165,7 +167,6 @@ const modelPageAJax = async () => {
       pageSize: state.pageSize,
       name: state.formData.name
     })
-
     if (res) {
       const { total, list } = res
       if (list) {
@@ -253,18 +254,23 @@ const tabClick = (index) => {
     position: absolute;
     top: -50px;
     right: 0;
+
     .form-input {
       width: 216px;
       margin-left: auto;
     }
   }
+
   .tab-box {
     display: flex;
     margin-bottom: 17px;
+
     li {
       cursor: pointer;
       list-style: none;
-      font-family: HarmonyOS Sans SC, HarmonyOS Sans SC;
+      font-family:
+        HarmonyOS Sans SC,
+        HarmonyOS Sans SC;
       font-weight: 500;
       font-size: 13px;
       color: #696f7a;
@@ -273,39 +279,49 @@ const tabClick = (index) => {
       position: relative;
       padding-bottom: 10px;
     }
+
     .active {
       color: #000000 !important;
       font-weight: bold !important;
+
       .total {
         font-weight: bold !important;
         font-size: 12px !important;
         color: #000000 !important;
       }
+
       .line {
         display: block !important;
       }
     }
   }
+
   .model-content-table {
     min-height: calc(100vh - 404px);
+
     .empty {
       display: flex;
       justify-content: center;
       align-items: center;
       height: calc(100vh - 384px);
+
       .empty-box {
         img {
           width: 160px;
           margin: 0 auto;
           display: block;
         }
+
         .empty-text {
-          font-family: PingFang SC, PingFang SC;
+          font-family:
+            PingFang SC,
+            PingFang SC;
           font-weight: 400;
           font-size: 12px;
           text-align: center;
           color: #999999;
           line-height: 16px;
+
           span {
             color: #434af9;
             border-bottom: 1xp solid #434af9;
@@ -314,15 +330,18 @@ const tabClick = (index) => {
         }
       }
     }
+
     .table-list {
       display: grid;
       grid-template-columns: repeat(4, 1fr); /* 每行 5 列 */
       gap: 20px; /* 项目之间的间距 */
       padding-bottom: 40px;
       color: #ccc;
+
       .li:hover {
         transform: scale(1.01);
         box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.12);
+
         .download-preview {
           z-index: 2;
           background: rgba(0, 0, 0, 0.6);
@@ -330,9 +349,10 @@ const tabClick = (index) => {
           justify-content: center;
           align-items: center;
           position: relative;
+
           .download-preview-content {
             .download-button {
-              padding:0 5px;
+              padding: 0 5px;
               height: 30px;
               cursor: pointer;
               background: #434af9;
@@ -341,7 +361,9 @@ const tabClick = (index) => {
               align-items: center;
               justify-content: center;
               border: 1px solid #434af9;
-              font-family: PingFang SC, PingFang SC;
+              font-family:
+                PingFang SC,
+                PingFang SC;
               font-weight: 500;
               font-size: 12px;
               color: #ffffff;
@@ -352,6 +374,7 @@ const tabClick = (index) => {
                 margin-right: 4px;
               }
             }
+
             .preview-box {
               padding: 0 5px;
               height: 18px;
@@ -365,15 +388,19 @@ const tabClick = (index) => {
               cursor: pointer;
               bottom: 6px;
               z-index: 1;
-              font-family: HarmonyOS Sans SC, HarmonyOS Sans SC;
+              font-family:
+                HarmonyOS Sans SC,
+                HarmonyOS Sans SC;
               font-weight: 400;
               font-size: 10px;
               color: #ffffff;
               line-height: 12px;
+
               img {
                 margin-right: 4px;
               }
             }
+
             .delete-video {
               width: 20px;
               height: 20px;
@@ -388,8 +415,11 @@ const tabClick = (index) => {
               top: 10px;
               z-index: 1;
             }
+
             .detection-failed-text {
-              font-family: PingFang SC, PingFang SC;
+              font-family:
+                PingFang SC,
+                PingFang SC;
               font-weight: 500;
               font-size: 12px;
               width: 80px;
@@ -399,8 +429,11 @@ const tabClick = (index) => {
               line-height: 18px;
               margin-bottom: 12px;
             }
+
             .detection-failed-title {
-              font-family: PingFang SC, PingFang SC;
+              font-family:
+                PingFang SC,
+                PingFang SC;
               font-weight: 400;
               width: 80px;
               font-size: 12px;
@@ -409,6 +442,7 @@ const tabClick = (index) => {
               color: #ffffff;
               line-height: 18px;
             }
+
             .preview-button {
               width: 80px;
               height: 30px;
@@ -418,12 +452,15 @@ const tabClick = (index) => {
               justify-content: center;
               margin-bottom: 8px;
               border-radius: 4px;
-              font-family: PingFang SC, PingFang SC;
+              font-family:
+                PingFang SC,
+                PingFang SC;
               font-weight: 500;
               font-size: 12px;
               color: #ffffff;
               line-height: 18px;
               border: 1px solid rgba(255, 255, 255, 0.6);
+
               img {
                 margin-right: 4px;
               }
@@ -443,6 +480,7 @@ const tabClick = (index) => {
         .download-preview {
           display: none;
         }
+
         .comme {
           position: absolute;
           top: 0;
@@ -451,17 +489,21 @@ const tabClick = (index) => {
           border-radius: 8px 8px 0 0;
           height: calc(100% - 65px);
         }
+
         .img-video {
           z-index: 1;
           background: linear-gradient(180deg, #b8c2ce 0%, #e2e6f0 100%);
+
           .img-video-content {
             position: relative;
             height: 100%;
+
             .model-video {
               width: 100%;
               height: 100%;
               object-fit: contain;
             }
+
             .duration {
               width: 35px;
               position: absolute;
@@ -470,7 +512,9 @@ const tabClick = (index) => {
               height: 18px;
               background: rgba(0, 0, 0, 0.63);
               border-radius: 4px;
-              font-family: PingFang SC, PingFang SC;
+              font-family:
+                PingFang SC,
+                PingFang SC;
               font-weight: 400;
               display: flex;
               justify-content: center;
@@ -480,6 +524,7 @@ const tabClick = (index) => {
               line-height: 12px;
               font-style: normal;
             }
+
             .fail {
               padding: 0 6px;
               height: 22px;
@@ -491,6 +536,7 @@ const tabClick = (index) => {
               align-items: center;
               top: 0;
               right: 0;
+
               .fail-line {
                 width: 4px;
                 height: 4px;
@@ -498,8 +544,11 @@ const tabClick = (index) => {
                 background-color: red;
                 margin-right: 5px;
               }
+
               span {
-                font-family: HarmonyOS Sans SC, HarmonyOS Sans SC;
+                font-family:
+                  HarmonyOS Sans SC,
+                  HarmonyOS Sans SC;
                 font-weight: 400;
                 font-size: 12px;
                 color: #253858;
@@ -508,6 +557,7 @@ const tabClick = (index) => {
             }
           }
         }
+
         .bottom-text {
           position: absolute;
           bottom: 0;
@@ -516,6 +566,7 @@ const tabClick = (index) => {
           width: 100%;
           height: 65px;
           background: #ffffff;
+
           .top {
             display: flex;
             margin-top: 5px;
@@ -523,6 +574,7 @@ const tabClick = (index) => {
             overflow: hidden;
             text-overflow: ellipsis;
             margin-bottom: 4px;
+
             .video-type {
               padding: 6px 7px;
               display: none;
@@ -530,15 +582,20 @@ const tabClick = (index) => {
               align-items: center;
               background: rgba(6, 96, 255, 0.1);
               border-radius: 4px;
-              font-family: PingFang SC, PingFang SC;
+              font-family:
+                PingFang SC,
+                PingFang SC;
               font-weight: 500;
               font-size: 10px;
               color: #434af9;
               font-size: 14px;
               line-height: 12px;
             }
+
             .h1 {
-              font-family: HarmonyOS Sans SC, HarmonyOS Sans SC;
+              font-family:
+                HarmonyOS Sans SC,
+                HarmonyOS Sans SC;
               font-weight: 600;
               font-size: 14px;
               color: #252525;
@@ -546,8 +603,11 @@ const tabClick = (index) => {
               margin-left: 4px;
             }
           }
+
           .text {
-            font-family: HarmonyOS Sans SC, HarmonyOS Sans SC;
+            font-family:
+              HarmonyOS Sans SC,
+              HarmonyOS Sans SC;
             font-weight: 400;
             font-size: 12px;
             color: rgba(37, 37, 37, 0.5);
@@ -569,6 +629,7 @@ const tabClick = (index) => {
     bottom: -20px;
     left: 0;
     background-color: #fff;
+
     .pagination-content {
       justify-content: center;
       display: flex;

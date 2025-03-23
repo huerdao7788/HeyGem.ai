@@ -66,7 +66,7 @@ const action = {
     state.initLoading = true
     try {
       const { videoId, modelId } = route.query
-
+      console.log('init',modelId,videoId)
       action.initWatchs()
 
       // 初始化视频详情
@@ -109,8 +109,12 @@ const action = {
     watch(
       () => state.select.model,
       async (model) => {
-        if (model?.voice_id) {
-          state.select.speaker = model
+        if (model?.voiceId) {
+          state.select.speaker = {
+            id: model.voiceId,
+            name: model.name,
+            audioPath: model.audioPath
+          }
         }
       }
     )
@@ -140,11 +144,12 @@ const action = {
       state.video.id = videoDetail.id
       state.video.name = videoDetail.name
       state.select.text = videoDetail.text_content
-      state.select.model.id = videoDetail.model_id
+      state.select.model.id = videoDetail.modelId
     }
   },
   async initModelDetail(modelId) {
     const modelDetail = await findModel(modelId)
+    console.log('model',modelDetail)
     state.select.model = modelDetail
   },
   check() {
@@ -181,21 +186,21 @@ const action = {
   },
   async save() {
     if (state.initLoading) return
-    // model_id, name, text_content
+    // modelId, name, text_content
     const { select, video } = state
 
     const sumitAudio = {}
     if (select.uploaded?.audioUrl) {
-      sumitAudio.audio_path = select.uploaded.audioUrl
+      sumitAudio.audioPath = select.uploaded.audioUrl
     } else {
-      sumitAudio.voice_id = select.speaker.voice_id
+      sumitAudio.voiceId = select.speaker.voiceId
     }
 
     const saveId = await saveVideo({
       id: video.id,
-      model_id: select.model.id,
+      modelId: select.model.id,
       name: video.name,
-      text_content: select.text,
+      textContent: select.text,
       ...sumitAudio
     })
     return video.id || saveId

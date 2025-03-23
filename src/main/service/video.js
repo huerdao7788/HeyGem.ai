@@ -1,29 +1,9 @@
 import { ipcMain } from 'electron'
-import crypto from 'crypto'
-import path from 'path'
 import fs from 'fs'
-import { isEmpty } from 'lodash'
-import { assetPath } from '../config/config.js'
-import {
-  selectPage,
-  selectByStatus,
-  updateStatus,
-  remove as deleteVideo,
-  findFirstByStatus
-} from '../dao/video.js'
-import { selectByID as selectF2FModelByID } from '../dao/f2f-model.js'
-import { selectByID as selectVoiceByID } from '../dao/voice.js'
-import {
-  insert as insertVideo,
-  count,
-  update,
-  selectByID as selectVideoByID
-} from '../dao/video.js'
-import { makeAudio4Video, copyAudio4Video } from './voice.js'
-import { makeVideo as makeVideoApi, getVideoStatus } from '../api/f2f.js'
-import log from '../logger.js'
-import { getVideoDuration } from '../util/ffmpeg.js'
-import { downloadFile, uploadFile } from '../api/file'
+import { serviceUrl } from '../config/config.js'
+import { saveAudio } from './voice.js'
+import { videoCount, videoDel, videoFind, videoPage, videoSave } from '../api/video'
+import request from '../api/request'
 
 const MODEL_NAME = 'video'
 
@@ -31,52 +11,48 @@ const MODEL_NAME = 'video'
  * 分页查询合成结果
  * @param {number} page
  * @param {number} pageSize
+ * @param name
  * @returns
  */
-function page({ page, pageSize, name = '' }) {
+async function page({ page, pageSize, name = '' }) {
   // 查询的有waiting状态的视频
-  const waitingVideos = selectByStatus('waiting').map((v) => v.id)
-  const total = count(name)
-  const list = selectPage({ page, pageSize, name }).map((video) => {
-    video = {
-      ...video,
-      file_path: video.file_path ? path.join(assetPath.model, video.file_path) : video.file_path
-    }
-
-    if (video.status === 'waiting') {
-      video.progress = `${waitingVideos.indexOf(video.id) + 1} / ${waitingVideos.length}`
-    }
-    return video
-  })
-
+  let { total, list } = await videoPage({ page: page, pageSize: pageSize, name: name })
+  if (list) {
+    list = list.map((video) => {
+      video = {
+        ...video,
+        filePath: serviceUrl.gateway + video.filePath
+      }
+      return video
+    })
+  }
   return {
     total,
     list
   }
 }
 
-function findVideo(videoId) {
-  const video = selectVideoByID(videoId)
+async function findVideo(videoId) {
+  const video = await videoFind({ id: videoId })
   return {
     ...video,
-    file_path: video.file_path ? path.join(assetPath.model, video.file_path) : video.file_path
+    filePath: serviceUrl.gateway + video.filePath
   }
 }
 
-function countVideo(name = '') {
-  return count(name)
+async function countVideo(name = '') {
+  return await videoCount({ name: name })
 }
 
-function saveVideo({ id, model_id, name, text_content, voice_id, audio_path }) {
-  const video = selectVideoByID(id)
-  if (audio_path) {
-    audio_path = copyAudio4Video(audio_path)
+async function saveVideo({ id, modelId, name, textContent, voiceId, audioPath }) {
+  if (audioPath) {
+    // 上传音频到服务器
+    let res = await saveAudio(audioPath)
+    voiceId = res.id
+    audioPath = res.audioPath
   }
-
-  if (video) {
-    return update({ id, model_id, name, text_content, voice_id, audio_path })
-  }
-  return insertVideo({ model_id, name, status: 'draft', text_content, voice_id, audio_path })
+  const { data } = await videoSave({ id, modelId, name, textContent, voiceId, audioPath })
+  return data.id
 }
 
 /**
@@ -85,206 +61,27 @@ function saveVideo({ id, model_id, name, text_content, voice_id, audio_path }) {
  * @param {number} videoId
  * @returns
  */
-function makeVideo(videoId) {
-  update({ id: videoId, status: 'waiting' })
+async function makeVideo(videoId) {
+  await videoSave({ id: videoId, status: 'waiting' })
   return videoId
 }
 
-export async function synthesisVideo(videoId) {
-  try {
-    update({
-      id: videoId,
-      file_path: null,
-      status: 'pending',
-      message: '正在提交任务'
-    })
-
-    // 查询Video
-    const video = selectVideoByID(videoId)
-    log.debug('~ makeVideo ~ video:', video)
-
-    // 根据modelId获取model信息
-    const model = selectF2FModelByID(video.model_id)
-    log.debug('~ makeVideo ~ model:', model)
-
-    let audioPath
-    if (video.audio_path) {
-      // 将audio_path复制到ttsProduct目录下
-      audioPath = video.audio_path
-    } else {
-      // 根据model信息中的voiceId获取voice信息
-      const voice = selectVoiceByID(video.voice_id || model.voice_id)
-      log.debug('~ makeVideo ~ voice:', voice)
-
-      // 调用tts接口生成音频
-      audioPath = await makeAudio4Video({
-        voiceId: voice.id,
-        text: video.text_content
-      })
-      log.debug('~ makeVideo ~ audioPath:', audioPath)
-    }
-
-    let videoBuffer = fs.readFileSync(path.join(assetPath.ttsProduct, audioPath))
-    await uploadFile({
-      file: videoBuffer.toString('base64'),
-      path: 'temp/' + audioPath,
-      fileType: 'video'
-    })
-    // 调用视频生成接口生成视频
-    let result, param
-    ;({ result, param } = await makeVideoByF2F(audioPath, model.video_path))
-
-    log.debug('~ makeVideo ~ result, param:', result, param)
-
-    // 插入视频表
-    if (10000 === result.code) {
-      // 成功
-      update({
-        id: videoId,
-        file_path: null,
-        status: 'pending',
-        message: result,
-        audio_path: audioPath,
-        param,
-        code: param.code
-      })
-    } else {
-      // 失败
-      update({
-        id: videoId,
-        file_path: null,
-        status: 'failed',
-        message: result.msg,
-        audio_path: audioPath,
-        param,
-        code: param.code
-      })
-    }
-  } catch (error) {
-    log.error('~ synthesisVideo ~ error:', error.message)
-    updateStatus(videoId, 'failed', error.message)
-  }
-
-  // 6. 返回视频id
-  return videoId
-}
-
-export async function loopPending() {
-  const video = findFirstByStatus('pending')
-  if (!video) {
-    synthesisNext()
-
-    setTimeout(() => {
-      loopPending()
-    }, 2000)
-    return
-  }
-
-  const statusRes = await getVideoStatus(video.code)
-
-  if ([9999, 10002, 10003].includes(statusRes.code)) {
-    updateStatus(video.id, 'failed', statusRes.msg)
-  } else if (statusRes.code === 10000) {
-    if (statusRes.data.status === 1) {
-      updateStatus(video.id, 'pending', statusRes.data.msg, statusRes.data.progress)
-    } else if (statusRes.data.status === 2) {
-      // 合成成功
-      // ffmpeg 获取视频时长
-      const resultPath = path.join(assetPath.model, statusRes.data.result)
-
-      if (!fs.existsSync(resultPath)) {
-        const videoRes = await downloadFile({
-          file: statusRes.data.result,
-          path: 'temp' + statusRes.data.result,
-          fileType: 'video'
-        })
-        // 创建写入流
-        fs.writeFileSync(resultPath, videoRes, 'binary')
-      }
-
-      let duration = await getVideoDuration(resultPath)
-
-
-
-      update({
-        id: video.id,
-        status: 'success',
-        message: statusRes.data.msg,
-        progress: statusRes.data.progress,
-        file_path: statusRes.data.result,
-        duration
-      })
-    } else if (statusRes.data.status === 3) {
-      updateStatus(video.id, 'failed', statusRes.data.msg)
-    }
-  }
-
-  setTimeout(() => {
-    loopPending()
-  }, 2000)
-  return video
-}
-
-/**
- * 合成下一个视频
- */
-function synthesisNext() {
-  // 查询所有未完成的视频任务
-  const video = findFirstByStatus('waiting')
-  if (video) {
-    synthesisVideo(video.id)
-  }
-}
-
-function removeVideo(videoId) {
-  // 查询视频
-  const video = selectVideoByID(videoId)
-  log.debug('~ removeVideo ~ videoId:', videoId)
-
+async function removeVideo(videoId) {
   // 删除视频
-  const videoPath = path.join(assetPath.model, video.file_path || '')
-  if (!isEmpty(video.file_path) && fs.existsSync(videoPath)) {
-    fs.unlinkSync(videoPath)
-  }
-
-  // 删除音频
-  const audioPath = path.join(assetPath.model, video.audio_path || '')
-  if (!isEmpty(video.audio_path) && fs.existsSync(audioPath)) {
-    fs.unlinkSync(audioPath)
-  }
-
-  // 删除视频表
-  return deleteVideo(videoId)
+  return await videoDel(videoId)
 }
 
-function exportVideo(videoId, outputPath) {
-  const video = selectVideoByID(videoId)
-  const filePath = path.join(assetPath.model, video.file_path)
-  fs.copyFileSync(filePath, outputPath)
+async function exportVideo(videoId, outputPath) {
+  const video = await videoFind({ id: videoId })
+  const res = await request.post(serviceUrl.gateway + video.filePath, {
+    responseType: 'arraybuffer'
+  })
+  fs.writeFileSync(outputPath, res, 'binary')
 }
 
-/**
- * 调用face2face生成视频
- * @param {string} audioPath
- * @param {string} videoPath
- * @returns
- */
-async function makeVideoByF2F(audioPath, videoPath) {
-  const uuid = crypto.randomUUID()
-  const param = {
-    audio_url: audioPath,
-    video_url: videoPath,
-    code: uuid,
-    chaofen: 0,
-    watermark_switch: 0,
-    pn: 1
-  }
-  const result = await makeVideoApi(param)
-  return { param, result }
-}
-
-function modify(video) {
-  return update(video)
+async function modify(video) {
+  const { data } = await saveVideo(video)
+  return data
 }
 
 export function init() {

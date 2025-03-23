@@ -84,11 +84,7 @@
             5）您不得将本软件产品的许可转让给任何第三方，也不得允许任何第三方使用本软件产品。
           </div>
         </div>
-        <div
-          v-if="!home.homeState.isAgree"
-          class="agree-btn"
-          @click="onAgree"
-        >
+        <div v-if="!home.homeState.isAgree" class="agree-btn" @click="onAgree">
           我已阅读并同意遵守此承诺
         </div>
       </template>
@@ -270,11 +266,7 @@
             allow any third party to use this Software Product.
           </div>
         </div>
-        <div
-          v-if="!home.homeState.isAgree"
-          class="agree-btn"
-          @click="onAgree"
-        >
+        <div v-if="!home.homeState.isAgree" class="agree-btn" @click="onAgree">
           I have read and agree
         </div>
       </template>
@@ -282,11 +274,11 @@
   </div>
 </template>
 <script setup>
-import { reactive, onUpdated, ref } from 'vue'
+import { ref } from 'vue'
 import { useHomeStore } from '@renderer/stores/home.js'
-import { saveContext } from '@renderer/api/index.js'
-import { agreementKey } from '@renderer/utils/const.js'
 import { useI18n } from 'vue-i18n'
+import { agreementKey } from '@renderer/utils/const'
+
 const { locale } = useI18n()
 const home = useHomeStore()
 defineProps({
@@ -304,12 +296,10 @@ const onAgree = () => {
 
 const close = async () => {
   try {
-    const res = await saveContext(agreementKey, 'true')
-    if (res) {
-      home.setIsAgree(true)
-      home.setAgreementVisible(false)
-      emit('update:modelValue', false)
-    }
+    localStorage.setItem(agreementKey, 'true')
+    home.setIsAgree(true)
+    home.setAgreementVisible(false)
+    emit('update:modelValue', false)
   } catch (error) {
     console.log(error)
   }

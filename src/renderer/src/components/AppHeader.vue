@@ -4,26 +4,42 @@
       <img class="logo" src="@renderer/assets/images/icons/logo.png" alt="logo" />
     </div>
     <div class="header-right">
-      <t-dropdown :maxColumnWidth="false" :min-column-width="88" panel-top-content="" placement="bottom-right"
-        @click="action.clickHandler">
+      <t-dropdown
+        :maxColumnWidth="false"
+        :min-column-width="88"
+        panel-top-content=""
+        placement="bottom-right"
+        @click="action.clickHandler"
+      >
         <div class="header-right-item" style="width: 70px">
           <img src="@renderer/assets/images/icons/setting.svg" alt="setting" />
           <div class="header-right-item-text">{{ $t('common.setting.title') }}</div>
         </div>
         <t-dropdown-menu>
-          <t-dropdown-item :value="item.value" v-for="(item, index) in state.menuList" :key="index + 'menuList'"
-            class="dropdown-box">
+          <t-dropdown-item
+            :value="item.value"
+            v-for="(item, index) in state.menuList"
+            :key="index + 'menuList'"
+            class="dropdown-box"
+          >
             <div class="language-switch-box">
               <span>{{ item.content }}</span>
-              <img v-if="item.value === 'languageSwitch'" src="@renderer/assets/images/icons/switch.svg" alt="switch"
-                class="language-switch" />
+              <img
+                v-if="item.value === 'languageSwitch'"
+                src="@renderer/assets/images/icons/switch.svg"
+                alt="switch"
+                class="language-switch"
+              />
             </div>
 
             <t-dropdown-menu v-if="item.children">
-              <t-dropdown-item v-for="(itemChildren, indexChildren) in item.children"
-                :key="indexChildren + 'itemChildren'" :value="itemChildren.value"
-                :class="itemChildren.value === home.homeState.language ? 'language-active' : ''">{{ itemChildren.content
-                }}</t-dropdown-item>
+              <t-dropdown-item
+                v-for="(itemChildren, indexChildren) in item.children"
+                :key="indexChildren + 'itemChildren'"
+                :value="itemChildren.value"
+                :class="itemChildren.value === home.homeState.language ? 'language-active' : ''"
+                >{{ itemChildren.content }}</t-dropdown-item
+              >
             </t-dropdown-menu>
           </t-dropdown-item>
         </t-dropdown-menu>
@@ -34,8 +50,11 @@
         </t-tooltip>
       </div>
       <div class="header-right-item" @click="action.maximize">
-        <t-tooltip :content="state.isMaximized ? $t('common.header.restoreText') : $t('common.header.minimizeText')
-          ">
+        <t-tooltip
+          :content="
+            state.isMaximized ? $t('common.header.restoreText') : $t('common.header.minimizeText')
+          "
+        >
           <img src="@renderer/assets/images/icons/maximize.png" />
         </t-tooltip>
       </div>
@@ -53,8 +72,8 @@ import { reactive, watch } from 'vue'
 import { Client } from '@renderer/client'
 import { useHomeStore } from '@renderer/stores/home.js'
 import { useI18n } from 'vue-i18n'
-import { saveContext } from '@renderer/api/index.js'
-import { lang_ } from '@renderer/utils/const.js'
+import { agreementKey, lang_ } from '@renderer/utils/const'
+
 const { locale, t } = useI18n()
 const home = useHomeStore()
 const state = reactive({
@@ -127,12 +146,7 @@ const action = {
   }
 }
 const saveContextAjax = async (lang) => {
-  try {
-    const res = await saveContext(lang_, lang)
-    console.log(res)
-  } catch (error) {
-    console.log(error)
-  }
+  localStorage.setItem(lang_, lang)
 }
 </script>
 <style>
@@ -201,7 +215,9 @@ const saveContextAjax = async (lang) => {
       }
 
       &-text {
-        font-family: PingFang SC, PingFang SC;
+        font-family:
+          PingFang SC,
+          PingFang SC;
         font-weight: 400;
         font-size: 12px;
         color: #000000;

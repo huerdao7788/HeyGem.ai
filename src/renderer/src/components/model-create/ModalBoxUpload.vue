@@ -7,7 +7,7 @@
 
     <!-- 已上传 -->
     <div class="upload-box --uploaded" v-else-if="uploadInfo.videoPath" @click="action.upload">
-      <video class="video" :src="handlePath(uploadInfo.videoPath)" controls />
+      <video class="video" id="modelVideo" :src="handlePath(uploadInfo.videoPath)" controls />
     </div>
 
     <!-- 未上传 -->
@@ -41,11 +41,8 @@ const action = {
     const filePath = await Client.file.selectVideo()
     if (filePath) {
       state.isUploading = true
-      const videoInfo = await Client.file.getVideoInfo(filePath)
+      uploadInfo.value.videoPath = filePath
       state.isUploading = false
-      if (action.check(videoInfo)) {
-        uploadInfo.value.videoPath = filePath
-      }
     }
   },
   check(videoInfo) {

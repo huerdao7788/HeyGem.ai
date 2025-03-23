@@ -1,13 +1,10 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { join } from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/logo-solid.png?asset'
-import { initDB } from './db'
 import { registerHandler } from './service'
-import { init as initInterval } from './interval/interval.js'
 import { registerWebHandles } from './handlers'
-initDB()
-initInterval()
+
 
 function createWindow() {
   // Create the browser window.

@@ -33,7 +33,7 @@
                 {{ item.duration + '' ? millisecondsToTime(item.duration * 1000) : '00:00' }}
               </div>
               <div v-if="item.status === 'success'" class="works-video">
-                <video :src="handlePath(item.file_path)"></video>
+                <video :src="handlePath(item.filePath)"></video>
               </div>
               <!--  <video class="works-video" src="../../../assets/images/home/aa.mp4"></video> -->
               <img
@@ -64,7 +64,7 @@
               <div
                 v-if="item.status === 'success'"
                 class="preview-button"
-                @click="previewVideo(item.file_path)"
+                @click="previewVideo(item.filePath)"
               >
                 <img src="../../../assets/images/home/video.svg" />
                 <span>{{ $t('common.videoList.previewTitle') }}</span>
@@ -125,7 +125,7 @@
           <div class="bottom-text">
             <div class="h1">{{ item.name }}</div>
             <div class="text">
-              {{ item.created_at ? formatDate(item.created_at) : '' }}
+              {{ item.createdAt ? formatDate(item.createdAt) : '' }}
             </div>
           </div>
         </div>
@@ -271,7 +271,7 @@ const okDelete = () => {
     })
 }
 const downloadVideo = async (video) => {
-  const fileExtension = video.file_path?.split('.')?.pop()
+  const fileExtension = video.filePath?.split('.')?.pop()
   const saveName = `${video.name}.${fileExtension}`
   // exportVideo
   try {

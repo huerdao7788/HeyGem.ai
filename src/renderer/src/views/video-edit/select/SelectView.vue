@@ -21,7 +21,7 @@
         <div class="model-list">
           <div class="model-list__item" v-for="model in data.modelList" :model-id="model.id" :key="model.id"
             @click="action.selectModel(model)" :class="{ '--active': data.model?.id === model.id }">
-            <video class="video" :src="handlePath(model.video_path)" />
+            <video class="video" :src="model.videoPath" />
             <div class="name" :title="model.name">{{ model.name }}</div>
           </div>
         </div>

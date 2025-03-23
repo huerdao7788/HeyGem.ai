@@ -53,17 +53,17 @@ const state = reactive({
 const action = {
   async textToAudio() {
     const { speaker, text } = select.value || {}
-    if (!speaker?.voice_id) {
-      MessagePlugin.error('请选择音色')
+    if (!speaker?.id) {
+      await MessagePlugin.error('请选择音色')
       return false
     }
     if (!text) {
-      MessagePlugin.error(t('common.message.videoContentText'))
+      await MessagePlugin.error(t('common.message.videoContentText'))
       return false
     }
     state.textToAudioLoading = true
     try {
-      const auditionUrl = await audition(speaker.voice_id, text)
+      const auditionUrl = await audition(speaker.id, text)
 
       const name = (speaker.name || '') + ' - ' + text.slice(0, 10)
 

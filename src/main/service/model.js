@@ -1,14 +1,8 @@
 import { ipcMain } from 'electron'
 import fs from 'fs'
-import path from 'path'
-import dayjs from 'dayjs'
-import { isEmpty } from 'lodash'
-import { insert, selectPage, count, selectByID, remove as deleteModel } from '../dao/f2f-model.js'
-import { train as trainVoice } from './voice.js'
-import { assetPath } from '../config/config.js'
-import log from '../logger.js'
-import { extractAudio } from '../util/ffmpeg.js'
-import { uploadFile } from '../api/file'
+import { serviceUrl } from '../config/config.js'
+import { modelAdd, modelCount, modelDel, modelFind, modelPage } from '../api/model'
+import FormData from 'form-data'
 
 const MODEL_NAME = 'model'
 
@@ -18,105 +12,45 @@ const MODEL_NAME = 'model'
  * @param {string} videoPath 模特视频路径
  * @returns
  */
-function addModel(modelName, videoPath) {
-  if (!fs.existsSync(assetPath.model)) {
-    fs.mkdirSync(assetPath.model, {
-      recursive: true
-    })
-  }
-  // copy video to model video path
-  const extname = path.extname(videoPath)
-  const modelFileName = dayjs().format('YYYYMMDDHHmmssSSS') + extname
-  const modelPath = path.join(assetPath.model, modelFileName)
-
-  fs.copyFileSync(videoPath, modelPath)
-
-  // 用ffmpeg分离音频
-  if (!fs.existsSync(assetPath.ttsTrain)) {
-    fs.mkdirSync(assetPath.ttsTrain, {
-      recursive: true
-    })
-  }
-
-  const audioPath = path.join(assetPath.ttsTrain, modelFileName.replace(extname, '.wav'))
-  return extractAudio(modelPath, audioPath)
-    .then(() => {
-      // 训练语音模型
-      const relativeAudioPath = path.relative(assetPath.ttsRoot, audioPath)
-      let audioBuffer = fs.readFileSync(audioPath)
-      return uploadFile({
-        file: audioBuffer.toString('base64'),
-        path: relativeAudioPath,
-        fileType: 'audio'
-      }).then((r) => {
-        return trainVoice(relativeAudioPath, 'zh')
-      })
-    })
-    .then((voiceId) => {
-      let videoBuffer = fs.readFileSync(videoPath)
-      // 插入模特信息
-      const relativeModelPath = path.relative(assetPath.model, modelPath)
-      return uploadFile({
-        file: videoBuffer.toString('base64'),
-        path: 'temp/' + relativeModelPath,
-        fileType: 'video'
-      }).then((res) => {
-        const relativeAudioPath = path.relative(assetPath.ttsRoot, audioPath)
-
-        // insert model info to db
-        const id = insert({
-          modelName,
-          videoPath: relativeModelPath,
-          audioPath: relativeAudioPath,
-          voiceId
-        })
-        return id
-      })
-    })
+async function addModel(modelName, videoPath) {
+  const formData = new FormData()
+  formData.append('name', modelName)
+  formData.append('file', fs.createReadStream(videoPath))
+  const res = await modelAdd(formData)
+  return res.data.id
 }
 
-function page({ page, pageSize, name = '' }) {
-  const total = count(name)
-  return {
-    total,
-    list: selectPage({ page, pageSize, name }).map((model) => ({
+async function page({ page, pageSize, name }) {
+  const res = await modelPage({ page: page, pageSize: pageSize, name: name })
+  const list = res.data.list?.map((model) => {
+    return {
       ...model,
-      video_path: path.join(assetPath.model, model.video_path),
-      audio_path: path.join(assetPath.ttsRoot, model.audio_path)
-    }))
-  }
-}
-
-function findModel(modelId) {
-  const model = selectByID(modelId)
+      videoPath: serviceUrl.gateway + model.videoPath,
+      audioPath: serviceUrl.gateway + model.audioPath
+    }
+  })
   return {
-    ...model,
-    video_path: path.join(assetPath.model, model.video_path),
-    audio_path: path.join(assetPath.ttsRoot, model.audio_path)
+    total: res.data.total,
+    list: list
   }
 }
 
-function removeModel(modelId) {
-  const model = selectByID(modelId)
-  log.debug('~ removeModel ~ modelId:', modelId)
-
-  // 删除视频
-  const videoPath = path.join(assetPath.model, model.video_path || '')
-  if (!isEmpty(model.video_path) && fs.existsSync(videoPath)) {
-    fs.unlinkSync(videoPath)
+async function findModel(modelId) {
+  const { data } = await modelFind({ id: modelId })
+  return {
+    ...data.item,
+    videoPath: serviceUrl.gateway + data.item.videoPath,
+    audioPath: serviceUrl.gateway + data.item.audioPath
   }
-
-  // 删除音频
-  const audioPath = path.join(assetPath.ttsRoot, model.audio_path || '')
-  if (!isEmpty(model.audio_path) && fs.existsSync(audioPath)) {
-    fs.unlinkSync(audioPath)
-  }
-
-  deleteModel(modelId)
 }
 
-function countModel(name = '') {
-  return count(name)
+async function removeModel(modelId) {
+  await modelDel({ id: modelId })
+}
+
+async function countModel(name = '') {
+  const res = await modelCount({ name: name })
+  return res.data.count
 }
 
 export function init() {

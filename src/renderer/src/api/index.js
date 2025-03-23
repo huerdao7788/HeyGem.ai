@@ -13,7 +13,7 @@ export function removeVideo(id) {
 }
 
 export function saveVideo(video) {
-  // id, model_id, name, text_content, voice_id, audio_path
+  // id, modelId, name, text_content, voiceId, audioPath
   return window.electron.ipcRenderer.invoke('video/save', video)
 }
 
@@ -23,10 +23,6 @@ export function makeVideo(id) {
 
 export function exportVideo(id, outputPath) {
   return window.electron.ipcRenderer.invoke('video/export', id, outputPath)
-}
-
-export function modifyVideo(video) {
-  return window.electron.ipcRenderer.invoke('video/modify', video)
 }
 
 export function countVideo(name = '') {
@@ -53,15 +49,14 @@ export function countModel(name = '') {
 export function removeModel(id) {
   return window.electron.ipcRenderer.invoke('model/remove', id)
 }
-
-export function getContext(key) {
-  return window.electron.ipcRenderer.invoke('context/get', key)
+export function audition(id, text) {
+  return window.electron.ipcRenderer.invoke('voice/audition', id, text)
 }
 
-export function saveContext(key, val) {
-  return window.electron.ipcRenderer.invoke('context/save', key, val)
+export function voicePage({ page = 1, pageSize = 1, name = '' }) {
+  return window.electron.ipcRenderer.invoke('voice/page', { page, pageSize, name })
 }
 
-export function audition(voiceId, text) {
-  return window.electron.ipcRenderer.invoke('voice/audition', voiceId, text)
+export function voiceSave(path) {
+  return window.electron.ipcRenderer.invoke('voice/save', path)
 }

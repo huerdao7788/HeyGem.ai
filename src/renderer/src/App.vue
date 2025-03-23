@@ -3,12 +3,11 @@ import MenuLIst from '@renderer/components/menuLIst.vue'
 import { handleShowMenu } from '@renderer/utils/index.js'
 import AppHeader from '@renderer/components/AppHeader.vue'
 import Agreement from '@renderer/components/agreement.vue'
-import { watch, ref, onMounted } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useHomeStore } from '@renderer/stores/home.js'
 import { useI18n } from 'vue-i18n'
-import { getContext, saveContext } from '@renderer/api/index.js'
-import { agreementKey, lang_ } from '@renderer/utils/const.js'
+import { agreementKey, lang_ } from '@renderer/utils/const'
 
 const { locale } = useI18n()
 const unRoute = useRoute()
@@ -33,17 +32,12 @@ onMounted(() => {
   getContextAjax()
 })
 const saveContextAjax = async (lang) => {
-  try {
-    const res = await saveContext(lang_, lang)
-    console.log(res)
-  } catch (error) {
-    console.log(error)
-  }
+  localStorage.setItem(lang_, lang)
 }
 const getContextAjax = async () => {
   try {
-    const res = await getContext(agreementKey)
-    if (res && res.val === 'true') {
+    const res = localStorage.getItem(agreementKey)
+    if (res && res === 'true') {
       home.setIsAgree(true)
       home.setAgreementVisible(false)
     } else {
@@ -60,7 +54,10 @@ const getContextAjax = async () => {
   <div class="content-box">
     <AppHeader v-if="!isShowMenu" />
     <MenuLIst v-if="!isShowMenu" />
-    <div class="router-content-box" :style="!isShowMenu ? 'margin-left: 76px;margin-top: 60px;' : ''">
+    <div
+      class="router-content-box"
+      :style="!isShowMenu ? 'margin-left: 76px;margin-top: 60px;' : ''"
+    >
       <router-view v-slot="{ Component, route }">
         <component :is="Component" :key="route.path" />
       </router-view>

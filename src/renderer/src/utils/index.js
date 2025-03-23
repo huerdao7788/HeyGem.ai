@@ -30,7 +30,8 @@ export const formatDate = (time = new Date(), pattern = 'YYYY-MM-DD HH:mm:ss') =
 }
 
 export const handlePath = (path) => {
-  return path.startsWith('/') ? 'file://' + path : path
+  // return path.startsWith('/') ? 'file://' + path : path
+  return path
 }
 
 export const millisecondsToTime = (milliseconds) => {

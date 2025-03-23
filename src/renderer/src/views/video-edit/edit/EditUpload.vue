@@ -7,8 +7,17 @@
       </div>
       <div class="control">
         <div class="duration">{{ select.uploaded.duration }}</div>
-        <t-button class="start" size="small" @click="action.listen">试听</t-button>
-        <img class="delete" src="@renderer/assets/images/icons/icon-del.png" @click="action.deleteAudio" title="删除" />
+        <t-button class="start" size="small" @click="action.listen"
+          >试听</t-button
+        >
+        <t-button class="save" size="small" @click="action.save" :loading="state.audioLoading">上传</t-button>
+        <img
+          class="delete"
+          src="@renderer/assets/images/icons/icon-del.png"
+          @click="action.deleteAudio"
+          title="删除"
+          alt=""
+        />
       </div>
     </div>
     <div class="upload-box" v-else>
@@ -16,13 +25,15 @@
         <template #icon>
           <AddIcon />
         </template>
-        添加音频</t-button>
+        添加音频
+      </t-button>
       <div class="tip">
-        <img class="icon" src="@renderer/assets/images/icons/icon-alert.png" />
-        <span>单次最多上传1个录音文件；支持mp3、wav、flac、m4a文件，单个录音时长小于30分钟，请上传纯干音文件，背景音、噪音会影响视频合成效果哦～</span>
+        <img class="icon" src="@renderer/assets/images/icons/icon-alert.png" alt="" />
+        <span
+          >单次最多上传1个录音文件；支持mp3、wav、flac、m4a文件，单个录音时长小于30分钟，请上传纯干音文件，背景音、噪音会影响视频合成效果哦～</span
+        >
       </div>
     </div>
-
   </div>
 </template>
 <script setup>
@@ -31,6 +42,7 @@ import { AddIcon } from 'tdesign-icons-vue-next'
 import { millisecondsToTime } from '@renderer/utils'
 import { MessagePlugin } from 'tdesign-vue-next'
 import { Client } from '@renderer/client'
+import { voiceSave } from '@renderer/api'
 
 const props = defineProps({
   listener: {
@@ -39,9 +51,9 @@ const props = defineProps({
   }
 })
 
-
 const state = reactive({
   uploading: false,
+  audioLoading: false
 })
 
 const select = defineModel({})
@@ -52,14 +64,17 @@ const action = {
     if (filePath) {
       state.uploading = true
       try {
-        const info = await Client.file.getAudioInfo(filePath)
-        if (action.check(info)) {
-          select.value.uploaded = {
-            name: info.name,
-            audioUrl: filePath,
-            duration: millisecondsToTime(info.duration * 1000)
-          }
+        select.value.uploaded = {
+          name:
+            filePath.lastIndexOf('/') > 0
+              ? filePath.substring(filePath.lastIndexOf('/') + 1)
+              : filePath.substring(filePath.lastIndexOf('\\') + 1),
+          audioUrl: filePath
         }
+        const audio = new Audio(filePath)
+        audio.addEventListener('loadedmetadata', () => {
+          select.value.uploaded.duration = millisecondsToTime(audio.duration * 1000) // 获取音频时长
+        })
       } catch (err) {
         console.error(err)
       } finally {
@@ -90,14 +105,25 @@ const action = {
     const { name, audioUrl, duration } = select.value.uploaded
 
     props.listener.listen({ name, audioUrl, duration })
+  },
+  async save() {
+    if (!select.value.uploaded) return
+
+    state.audioLoading = true
+    try {
+      if (select.value.uploaded?.audioUrl) {
+        await voiceSave(select.value.uploaded?.audioUrl)
+      }
+    }finally {
+      state.audioLoading = false
+    }
+
+
   }
 }
-
-
 </script>
 <style lang="less" scoped>
 .upload {
-
   &-box {
     display: flex;
     align-items: center;
@@ -110,7 +136,7 @@ const action = {
     .btn {
       flex: none;
       height: 28px;
-      background: #3D4045;
+      background: #3d4045;
       border-radius: 4px 4px 4px 4px;
       border: none;
       font-weight: 500;
@@ -125,7 +151,7 @@ const action = {
       border-radius: 4px 4px 4px 4px;
       font-weight: 400;
       font-size: 10px;
-      color: #FF932F;
+      color: #ff932f;
       line-height: 16px;
       display: flex;
       align-items: center;
@@ -143,7 +169,7 @@ const action = {
     padding: 12px;
     width: 100%;
     height: 90px;
-    background: #191A1B;
+    background: #191a1b;
     border-radius: 4px 4px 4px 4px;
     display: flex;
     flex-direction: column;
@@ -155,7 +181,7 @@ const action = {
       gap: 6px;
       font-weight: 400;
       font-size: 12px;
-      color: #FFFFFF;
+      color: #ffffff;
       line-height: 20px;
 
       .tag {
@@ -166,7 +192,7 @@ const action = {
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #309CFF;
+        color: #309cff;
       }
     }
 
@@ -183,6 +209,13 @@ const action = {
         line-height: 14px;
       }
 
+      .save {
+        min-width: 48px;
+        height: 22px;
+        border-radius: 3px;
+        font-size: 12px;
+      }
+
       .start {
         margin-left: auto;
         width: 44px;
@@ -197,8 +230,6 @@ const action = {
         cursor: pointer;
       }
     }
-
   }
-
 }
 </style>

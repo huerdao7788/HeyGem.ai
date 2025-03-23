@@ -8,7 +8,7 @@
     </t-input>
     <div class="list-box noscrollbar">
       <div class="list-box__item" v-for="speaker in state.speakerList" :speaker-id="speaker.id" :key="speaker.id"
-        @click="action.selectSpeaker(speaker)" :class="{ '--active': select.speaker?.id == speaker.id }">
+        @click="action.selectSpeaker(speaker)" :class="{ '--active': select.speaker?.id === speaker.id }">
         <t-avatar class="avatar" :alt="speaker.name">{{ speaker.name.slice(0, 1) }}</t-avatar>
         <div class="name" :title="speaker.name">{{ speaker.name }}</div>
         <t-image class="btn" v-if="state.playingId !== speaker.id" :src="PlayIcon"
@@ -24,7 +24,7 @@ import { reactive, onUnmounted, watchEffect } from 'vue'
 import { SearchIcon } from 'tdesign-icons-vue-next'
 import PlayIcon from '@renderer/assets/images/icons/icon-play.png'
 import PauseIcon from '@renderer/assets/images/icons/icon-pause.png'
-import { modelPage } from '@renderer/api'
+import { voicePage } from '@renderer/api'
 import { MessagePlugin } from 'tdesign-vue-next'
 import { handlePath } from '@renderer/utils'
 
@@ -76,7 +76,7 @@ const action = {
   },
   async searchList() {
     try {
-      const result = await modelPage({
+      const result = await voicePage({
         name: state.search,
         page: 1,
         pageSize: 100
@@ -106,14 +106,14 @@ const action = {
     state.playingId = ''
   },
   playAudio(speaker) {
-    audio.src = handlePath(speaker.audio_path)
+    audio.src = handlePath(speaker.audioPath)
     state.playingId = speaker.id
     audio.play()
   },
 
   handlePlay(speaker) {
     action.selectSpeaker(speaker)
-    if (!speaker.audio_path) {
+    if (!speaker.audioPath) {
       MessagePlugin.error(`未找到${speaker.name}的音频链接`)
       return
     }
