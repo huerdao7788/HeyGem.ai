@@ -143,7 +143,7 @@ const action = {
     if (videoDetail) {
       state.video.id = videoDetail.id
       state.video.name = videoDetail.name
-      state.select.text = videoDetail.text_content
+      state.select.text = videoDetail.textContent
       state.select.model.id = videoDetail.modelId
     }
   },
@@ -190,12 +190,12 @@ const action = {
     const { select, video } = state
 
     const sumitAudio = {}
-    if (select.uploaded?.audioUrl) {
+    if (select.uploaded?.audioUrl && !select.text) {
       sumitAudio.audioPath = select.uploaded.audioUrl
     } else {
-      sumitAudio.voiceId = select.speaker.voiceId
+      sumitAudio.voiceId = select.speaker.id
     }
-
+    console.log('sumitAudio',sumitAudio)
     const saveId = await saveVideo({
       id: video.id,
       modelId: select.model.id,
