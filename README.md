@@ -316,3 +316,101 @@ Interface: `http://127.0.0.1:18180/v1/invoke`
 
 - ASR based on [fun-asr](https://github.com/modelscope/FunASR)
 - TTS based on [fish-speech-ziming](https://github.com/fishaudio/fish-speech)
+
+# HeyGem.ai
+
+HeyGem.ai 是一个面向创作者的智能生成工具平台，集成了视频、模型和语音服务，帮助用户轻松创建高质量的数字内容。
+
+## 技术栈
+
+- 前端框架：Vue.js
+- 构建工具：Vite
+- 样式处理：SCSS
+- HTTP客户端：Axios
+- 部署：Docker + Nginx
+
+## 本地开发
+
+### 环境准备
+
+- Node.js 16+
+- npm 或 yarn
+
+### 安装依赖
+
+```bash
+npm install
+# 或
+yarn
+```
+
+### 启动开发服务器
+
+```bash
+npm run dev
+# 或
+yarn dev
+```
+
+开发服务器启动后，访问 http://localhost:3000
+
+### 构建生产版本
+
+```bash
+npm run build
+# 或
+yarn build
+```
+
+## 项目结构
+
+```
+src/
+  ├── renderer/
+  │   ├── src/
+  │   │   ├── api/          # API接口
+  │   │   ├── assets/       # 静态资源
+  │   │   ├── components/   # 公共组件
+  │   │   ├── config/       # 配置文件
+  │   │   ├── router/       # 路由配置
+  │   │   ├── store/        # 状态管理
+  │   │   ├── styles/       # 全局样式
+  │   │   ├── utils/        # 工具函数
+  │   │   ├── views/        # 页面组件
+  │   │   ├── App.vue       # 根组件
+  │   │   └── main.js       # 入口文件
+```
+
+## 代理配置
+
+在开发模式下，API请求会通过Vite的代理功能转发到实际服务器，避免跨域问题。相关配置在`vite.config.js`文件中。
+
+## 环境变量
+
+项目使用以下环境变量文件：
+
+- `.env`：开发环境
+- `.env.production`：生产环境
+
+## 部署
+
+请参考[部署指南](DEPLOY.md)了解如何将应用部署到生产环境。
+
+## 功能特性
+
+- 视频生成与编辑
+- 3D模型处理
+- 语音合成
+- 内容创作工具
+
+## 贡献指南
+
+1. Fork 项目
+2. 创建功能分支 (`git checkout -b feature/amazing-feature`)
+3. 提交更改 (`git commit -m 'Add some amazing feature'`)
+4. 推送分支 (`git push origin feature/amazing-feature`)
+5. 创建 Pull Request
+
+## 许可证
+
+本项目采用 MIT 许可证 - 详见 [LICENSE](LICENSE) 文件。
