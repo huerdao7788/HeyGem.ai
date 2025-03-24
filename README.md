@@ -92,6 +92,52 @@ Since we open-sourced Heygem, global geeks have illuminated the digital avatar m
 
 Heygem is a fully offline video synthesis tool designed for Windows systems that can precisely clone your appearance and voice, digitalizing your image. You can create videos by driving virtual avatars through text and voice. No internet connection is required, protecting your privacy while enjoying convenient and efficient digital experiences.
 
+## Development Setup with PNPM
+
+This project uses pnpm as the package manager for better dependency management and faster installation.
+
+### Install pnpm globally (if not already installed)
+
+```bash
+npm install -g pnpm
+```
+
+### Clone repository and install dependencies
+
+```bash
+git clone https://github.com/GuijiAI/HeyGem.ai.git
+cd HeyGem.ai
+pnpm install
+```
+
+### Start the development server
+
+```bash
+pnpm dev
+```
+
+### Build for production
+
+```bash
+pnpm build
+```
+
+### Other available scripts
+
+```bash
+# Clean the dist directory
+pnpm clean
+
+# Run code linting
+pnpm lint
+
+# Format code
+pnpm format
+
+# Clean install (removes node_modules and lock file, then reinstalls)
+pnpm install:clean
+```
+
 - Core Features
   - Precise Appearance and Voice Cloning: Using advanced AI algorithms to capture human facial features with high precision, including facial features, contours, etc., to build realistic virtual models. It can also precisely clone voices, capturing and reproducing subtle characteristics of human voices, supporting various voice parameter settings to create highly similar cloning effects.
   - Text and Voice-Driven Virtual Avatars: Understanding text content through natural language processing technology, converting text into natural and fluent speech to drive virtual avatars. Voice input can also be used directly, allowing virtual avatars to perform corresponding actions and facial expressions based on the rhythm and intonation of the voice, making the virtual avatar's performance more natural and vivid.

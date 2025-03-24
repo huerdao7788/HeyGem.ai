@@ -36,3 +36,8 @@ coverage
 .npm
 .yarn
 .pnp.*
+
+# pnpm特有
+.pnpm-store/
+.pnpm-workspace.yaml
+**/node_modules/.pnpm/

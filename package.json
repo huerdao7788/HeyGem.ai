@@ -4,35 +4,42 @@
   "description": "An open source, affordable alternative to Heygen",
   "author": "guiji.ai",
   "homepage": "https://heygem.ai",
+  "packageManager": "pnpm@8.15.5",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.14.0"
+  },
   "scripts": {
     "clean": "rimraf dist",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "format": "prettier --write .",
-    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix"
+    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
+    "install:clean": "rimraf node_modules && rimraf pnpm-lock.yaml && pnpm install",
+    "preinstall": "node ./only-allow-pnpm.js"
   },
   "dependencies": {
-    "axios": "1.8.2",
+    "axios": "1.8.4",
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.7",
     "form-data": "^4.0.2",
     "lodash-es": "^4.17.21",
-    "pinia": "^2.2.6",
-    "tdesign-icons-vue-next": "^0.3.3",
-    "tdesign-vue-next": "^1.10.3",
-    "vue-i18n": "^10.0.5",
-    "vue-router": "^4.4.5"
+    "pinia": "^3.0.1",
+    "tdesign-icons-vue-next": "^0.3.5",
+    "tdesign-vue-next": "^1.11.4",
+    "vue-i18n": "^11.1.2",
+    "vue-router": "^4.5.0"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.10.3",
     "@vitejs/plugin-vue": "^5.0.5",
-    "@vue/eslint-config-prettier": "^9.0.0",
-    "eslint": "^8.57.0",
-    "eslint-plugin-vue": "^9.26.0",
+    "@vue/eslint-config-prettier": "^10.2.0",
+    "eslint": "^9.23.0",
+    "eslint-plugin-vue": "^10.0.0",
     "less": "^4.2.0",
     "prettier": "^3.3.2",
-    "vite": "^5.3.5",
+    "vite": "^6.2.3",
     "vue": "^3.5.13"
   }
 }
