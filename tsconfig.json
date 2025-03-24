@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+
+    /* 增强编辑器体验 */
+    "types": ["node"],
+
+    /* 允许从.js文件导入 */
+    "allowJs": true,
+    "checkJs": false, /* 不检查JS文件，便于渐进式迁移 */
+
+    /* 渐进式迁移相关配置 */
+    "noImplicitAny": false, /* 初期不强制要求类型标注，便于渐进式迁移 */
+    "strict": false, /* 初期不启用所有严格类型检查，便于渐进式迁移 */
+    "strictNullChecks": false, /* 初期不严格检查null和undefined，便于渐进式迁移 */
+
+    /* 路径和声明文件 */
+    "moduleResolution": "Bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@renderer/*": ["./src/*"]
+    },
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "preserve",
+
+    /* 与Vue 3开发相关配置 */
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "src/**/*.js", /* 包含JS文件，以便逐步迁移 */
+    "src/**/*.jsx"
+  ],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

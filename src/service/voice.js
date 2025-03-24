@@ -1,5 +1,5 @@
 import { makeAudio as makeAudioApi } from '../api/tts.js'
-import { serviceUrl } from '../config/config.js'
+import { serviceUrl } from '../config'
 import { voicePage, voiceSave } from '../api/voice'
 
 export async function saveAudio(filePath) {

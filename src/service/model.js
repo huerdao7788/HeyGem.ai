@@ -1,4 +1,4 @@
-import { serviceUrl } from '../config/config.js'
+import { serviceUrl } from '../config'
 import { modelAdd, modelCount, modelDel, modelFind, modelPage } from '../api/model'
 
 /**

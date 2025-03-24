@@ -1,4 +1,4 @@
-import { serviceUrl } from '../config/config.js'
+import { serviceUrl } from '../config'
 import { saveAudio } from './voice.js'
 import { videoCount, videoDel, videoFind, videoPage, videoSave } from '../api/video'
 import request from '../api/request'

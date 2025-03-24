@@ -1,5 +1,5 @@
 import request from './request'
-import { serviceUrl } from '../config/config'
+import { serviceUrl } from '../config'
 
 export const modelPage = async (param) => {
   const searchParams = new URLSearchParams(param)
