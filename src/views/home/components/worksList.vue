@@ -157,7 +157,7 @@
 <script setup>
 import { reactive, onMounted, onBeforeUnmount, ref } from 'vue'
 import { DeleteIcon } from 'tdesign-icons-vue-next'
-import { videoPage, exportVideo, removeVideo } from '@renderer/api/index.js'
+import { videoPage, removeVideo } from '@renderer/api/index.js'
 import { formatDate, handlePath, millisecondsToTime } from '@renderer/utils/index.js'
 import VideoDialog from '@renderer/views/home/components/videoDialog.vue'
 import { useHomeStore } from '@renderer/stores/home.js'
@@ -188,7 +188,7 @@ const state = reactive({
   total: 0,
   delVideoId: '',
   worksList: [],
-  url: `file:///B:/dd.mov`,
+  url: ``,
   formData: {
     name: ''
   }
@@ -271,18 +271,44 @@ const okDelete = () => {
 }
 const downloadVideo = async (video) => {
   try {
+    // 检查视频路径是否有效
+    if (!video.filePath) {
+      throw new Error('视频文件路径无效')
+    }
+
     // 获取文件扩展名，如果无法获取则默认为mp4
     const fileExtension = video.filePath?.split('.')?.pop() || 'mp4'
-    const saveName = `${video.name || '视频'}.${fileExtension}`
+    const fileName = `${video.name || '视频'}.${fileExtension}`
 
-    // Web环境下直接调用exportVideo下载，不需要提前创建文件
-    await exportVideo(video.id, saveName)
+    // 显示下载准备提示
+    MessagePlugin.success(t('common.message.downloadStartText'))
 
-    // 下载成功提示
-    MessagePlugin.success(t('common.message.downloadSuccessText') || '下载成功')
+    try {
+      // 方式一：使用a标签的download属性强制下载
+      const a = document.createElement('a')
+      a.href = video.filePath
+      a.download = fileName
+      a.style.display = 'none'
+
+      document.body.appendChild(a)
+      a.click()
+
+      setTimeout(() => {
+        document.body.removeChild(a)
+      }, 100)
+    } catch (err) {
+      console.warn('下载失败', err)
+    }
+
+    // 清除任何可能存在的下载状态
+    if (state.downloadInfo && state.downloadInfo.videoId === video.id) {
+      state.downloadInfo.visible = false
+    }
+    if (state.downloading && state.downloading[video.id]) {
+      delete state.downloading[video.id]
+    }
   } catch (error) {
-    console.error('下载视频失败:', error)
-    MessagePlugin.error((error.message || t('common.message.downloadErrorText') || '下载失败'))
+    MessagePlugin.error(error.message || t('common.message.downloadErrorText'))
   }
 }
 </script>

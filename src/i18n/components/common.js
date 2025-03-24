@@ -72,7 +72,10 @@ export const commonZh = {
     VideoTextError: '请输入视频名称',
     VideoCopywritingTextError: '请输入视频文案',
     videoSynthesisTextError: '合成视频失败，请稍后再试',
-    initEditVideoPageFailed: '初始化视频编辑页面失败，请稍后再试'
+    initEditVideoPageFailed: '初始化视频编辑页面失败，请稍后再试',
+    downloadPrepareText: '准备下载中...',
+    downloadStartText: '下载已开始，请查看浏览器下载栏',
+    downloadErrorText: '下载失败'
   },
   modelCreateView: {
     headerTitle: '极速定制',
@@ -169,7 +172,7 @@ export const commonEn = {
     makeFailedText: 'Failed',
     draftsText: 'Drafts',
     underProduction: 'Generating, please wait for a moment.',
-    queuing: 'In the queue, please wait  for a moment.',
+    queuing: 'In the queue, please wait for a moment.',
     emptyText: "You don't have any video works yet",
     emptyLinkRouteText: 'click here',
     emptyRightText: 'to Create Video.'
@@ -199,7 +202,10 @@ export const commonEn = {
     VideoTextError: 'Please enter the video name',
     VideoCopywritingTextError: 'Please enter the video copy',
     videoSynthesisTextError: 'Video Create failed, please try again later',
-    initEditVideoPageFailed: 'Failed to initialize video editing page, please try again later'
+    initEditVideoPageFailed: 'Failed to initialize video editing page, please try again later',
+    downloadPrepareText: 'Preparing download...',
+    downloadStartText: 'Download started, please check your browser download bar',
+    downloadErrorText: 'Download failed'
   },
   modelCreateView: {
     headerTitle: 'Rapid customization',

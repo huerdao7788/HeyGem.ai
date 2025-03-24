@@ -23,11 +23,6 @@ export function saveVideo(video) {
 export function makeVideo(id) {
   return videoService.makeVideo(id)
 }
-
-export function exportVideo(id, outputPath) {
-  return videoService.exportVideo(id, outputPath)
-}
-
 export function countVideo(name = '') {
   return videoService.countVideo(name)
 }
@@ -85,6 +80,7 @@ export function voicePage({ page = 1, pageSize = 1, name = '' }) {
 export function voiceSave(path) {
   return voiceService.saveAudio(path)
 }
+
 
 // 为了处理debug功能
 export const devTools = {
