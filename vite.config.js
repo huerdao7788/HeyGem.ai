@@ -1,45 +1,42 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [vue()],
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, 'src'),
-      '@renderer': resolve(__dirname, 'src')
-    }
-  },
-  server: {
-    port: 3000,
-    open: true,
-    cors: true,
-    proxy: {
-      // 转发所有/api开头的请求到目标服务器
-      '/api': {
-        target: 'http://120.236.203.50:38000',
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-        configure: (proxy, options) => {
-          // 代理请求事件
-          proxy.on('error', (err, req, res) => {
-            console.log('代理错误', err);
-          });
-          proxy.on('proxyReq', (proxyReq, req, res) => {
-            console.log('发送请求到目标服务器', req.url);
-          });
-          proxy.on('proxyRes', (proxyRes, req, res) => {
-            console.log('收到目标服务器响应', req.url);
-          });
-        },
+export default defineConfig(({ command, mode }) => {
+  // 加载env文件中的环境变量
+  const env = loadEnv(mode, process.cwd())
+
+  // 打印加载的环境变量，便于调试
+  console.log('当前环境:', mode)
+  console.log('API目标地址:', env.VITE_API_TARGET)
+
+  return {
+    plugins: [vue()],
+    resolve: {
+      alias: {
+        '@': resolve(__dirname, 'src'),
+        '@renderer': resolve(__dirname, 'src')
       }
+    },
+    server: {
+      port: 3000,
+      open: true,
+      cors: true,
+      proxy: {
+        // 使用环境变量配置代理
+        '/api': {
+          target: env.VITE_API_TARGET,
+          changeOrigin: true,
+          secure: false,
+          rewrite: (path) => path.replace(/^\/api/, ''),
+        }
+      }
+    },
+    build: {
+      outDir: 'dist',
+      emptyOutDir: true,
+      sourcemap: true
     }
-  },
-  build: {
-    outDir: 'dist',
-    emptyOutDir: true,
-    sourcemap: true
   }
 })
