@@ -5,7 +5,7 @@ import AppHeader from '@renderer/components/AppHeader.vue'
 import Agreement from '@renderer/components/agreement.vue'
 import { onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useHomeStore } from '@renderer/stores/home.js'
+import { useHomeStore } from '@renderer/stores/home'
 import { useI18n } from 'vue-i18n'
 import { agreementKey, lang_ } from '@/utils/const'
 

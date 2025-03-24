@@ -1,27 +1,39 @@
 import { defineStore } from 'pinia'
 import { useAppStore } from './app'
 
+// 用户信息类型
+interface UserInfo {
+  id?: string | number
+  [key: string]: any
+}
+
+// 用户状态类型
+interface UserState {
+  userInfo: UserInfo
+  token: string
+}
+
 export const useUserStore = defineStore('user', {
-  state: () => ({
+  state: (): UserState => ({
     userInfo: {},
     token: ''
   }),
   getters: {
-    isLogined: (state) => !!state.token && state.userInfo?.id
+    isLogined: (state): boolean => !!state.token && !!state.userInfo?.id
   },
   actions: {
-    setToken(token) {
-      //已自动持久化
+    setToken(token: string): void {
+      // 已自动持久化
       this.token = token
     },
-    setUserInfo(userInfo) {
+    setUserInfo(userInfo: UserInfo): void {
       this.userInfo = userInfo
     },
-    logout() {
+    logout(): void {
       this.token = ''
       this.userInfo = {}
     },
-    async loginGuard() {
+    async loginGuard(): Promise<UserInfo> {
       if (this.isLogined) {
         return this.userInfo
       } else {

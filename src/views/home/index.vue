@@ -32,8 +32,8 @@
 import BannerList from "@renderer/views/home/components/bannerList.vue";
 import WorksList from "@renderer/views/home/components/worksList.vue";
 import MyModelList from "@renderer/views/home/components/myModelList.vue";
-import { reactive, onMounted, watch, ref } from "vue";
-import { useHomeStore } from "@renderer/stores/home.js";
+import { reactive, onMounted, watch, ref, onUnmounted } from "vue";
+import { useHomeStore } from "@renderer/stores/home";
 import { countVideo, countModel } from "@renderer/api/index";
 import { useRoute } from "vue-router";
 import { useI18n } from 'vue-i18n'

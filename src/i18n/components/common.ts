@@ -2,8 +2,6 @@
  * 通用文本
  */
 
-import { Button } from 'tdesign-vue-next'
-
 // 中文翻译
 export const commonZh = {
   menu: {

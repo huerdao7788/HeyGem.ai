@@ -50,7 +50,7 @@
 
 <script setup>
 import { reactive, watch } from 'vue'
-import { useHomeStore } from '@renderer/stores/home.js'
+import { useHomeStore } from '@renderer/stores/home'
 import { useI18n } from 'vue-i18n'
 import { agreementKey, lang_ } from '@renderer/utils/const'
 
