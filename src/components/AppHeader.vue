@@ -5,7 +5,7 @@
     </div>
     <div class="header-right">
       <t-dropdown
-        :maxColumnWidth="false"
+        :maxColumnWidth="'auto'"
         :min-column-width="88"
         panel-top-content=""
         placement="bottom-right"
