@@ -1,8 +1,10 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { ApiResponse, RequestConfig } from './types';
+import { serviceUrl, appConfig } from '../config';
 
 // 创建axios实例
 const instance: AxiosInstance = axios.create({
+  baseURL: serviceUrl.baseUrl, // 设置基础URL，避免每次请求都调用getApiUrl
   timeout: 60000, // 增加超时时间，以支持大文件下载
   withCredentials: false, // 跨域请求不发送cookies
   responseType: 'json', // 默认响应类型

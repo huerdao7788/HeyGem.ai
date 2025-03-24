@@ -1,6 +1,5 @@
 import request from './request';
 import { ApiResponse, PageParams, Video, VideoApi } from './types';
-import { getApiUrl } from '../utils/url';
 
 const apiUrl = '/v1/video';
 
@@ -11,7 +10,7 @@ const apiUrl = '/v1/video';
  */
 export const videoPage = async (param: PageParams): Promise<VideoApi.PageResponse> => {
   const searchParams = new URLSearchParams(param as any);
-  const { data } = await request.get(getApiUrl(`${apiUrl}/page?${searchParams}`));
+  const { data } = await request.get(`${apiUrl}/page?${searchParams}`);
   return data;
 };
 
@@ -22,7 +21,7 @@ export const videoPage = async (param: PageParams): Promise<VideoApi.PageRespons
  */
 export const videoCount = async (param: VideoApi.CountRequest): Promise<number> => {
   const searchParams = new URLSearchParams(param as any);
-  const { data } = await request.get(getApiUrl(`${apiUrl}/count?${searchParams}`));
+  const { data } = await request.get(`${apiUrl}/count?${searchParams}`);
   return data.count;
 };
 
@@ -34,7 +33,7 @@ export const videoCount = async (param: VideoApi.CountRequest): Promise<number> 
 export const videoSelectByStatus = async (param: VideoApi.SelectByStatusRequest): Promise<Video[]> => {
   const searchParams = new URLSearchParams(param as any);
   const { data } = await request.get(
-    getApiUrl(`${apiUrl}/selectByStatus?${searchParams}`)
+    `${apiUrl}/selectByStatus?${searchParams}`
   );
   return data.list;
 };
@@ -46,7 +45,7 @@ export const videoSelectByStatus = async (param: VideoApi.SelectByStatusRequest)
  */
 export const videoFind = async (param: VideoApi.FindRequest): Promise<Video> => {
   const searchParams = new URLSearchParams(param as any);
-  const { data } = await request.get(getApiUrl(`${apiUrl}/find?${searchParams}`));
+  const { data } = await request.get(`${apiUrl}/find?${searchParams}`);
   return data.item;
 };
 
@@ -57,17 +56,18 @@ export const videoFind = async (param: VideoApi.FindRequest): Promise<Video> => 
  */
 export const videoFindByStatus = async (param: VideoApi.FindByStatusRequest): Promise<Video> => {
   const searchParams = new URLSearchParams(param as any);
-  const { data } = await request.get(getApiUrl(`${apiUrl}/findByStatus?${searchParams}`));
+  const { data } = await request.get(`${apiUrl}/findByStatus?${searchParams}`);
   return data.item;
 };
 
 /**
  * 保存视频
- * @param param 视频信息
- * @returns 视频ID
+ * @param param 保存参数
+ * @returns 保存结果
  */
 export const videoSave = async (param: VideoApi.SaveRequest): Promise<{ data: { id: number } }> => {
-  return request.post(getApiUrl(`${apiUrl}/save`), param);
+  const { data } = await request.post(`${apiUrl}/save`, param);
+  return data;
 };
 
 /**
@@ -76,7 +76,8 @@ export const videoSave = async (param: VideoApi.SaveRequest): Promise<{ data: { 
  * @returns 删除结果
  */
 export const videoDel = async (id: number): Promise<ApiResponse<any>> => {
-  return request.delete(getApiUrl(`${apiUrl}/del/${id}`));
+  const { data } = await request.delete(`${apiUrl}/delete?id=${id}`);
+  return data;
 };
 
 /**
@@ -85,5 +86,6 @@ export const videoDel = async (id: number): Promise<ApiResponse<any>> => {
  * @returns 合成结果
  */
 export const videoMakeByF2F = async (id: number): Promise<ApiResponse<any>> => {
-  return request.post(getApiUrl(`${apiUrl}/makeByF2F/${id}`));
+  const { data } = await request.post(`${apiUrl}/make?id=${id}`);
+  return data;
 };

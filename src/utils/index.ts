@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { getAssetUrl, getApiUrl } from './url';
+import { getAssetUrl } from './url';
 
 export const handleShowMenu = (path: string): boolean => {
   const MenuList = ['/video/edit', '/login'];
@@ -52,4 +52,4 @@ export const getUniqueId = (): string => {
 };
 
 // 导出URL处理工具函数
-export { getAssetUrl, getApiUrl };
+export { getAssetUrl };

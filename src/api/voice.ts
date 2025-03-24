@@ -1,6 +1,5 @@
 import request from './request';
 import { ApiResponse, PageParams, VoiceApi } from './types';
-import { getApiUrl } from '../utils/url';
 
 const apiUrl = '/v1/voice';
 
@@ -28,7 +27,7 @@ export const voiceSave = async (param: File | FormData): Promise<VoiceApi.SaveRe
     };
   }
 
-  const res = await request.post<VoiceApi.SaveResponse>(getApiUrl(`${apiUrl}/save`), requestData, config);
+  const res = await request.post<VoiceApi.SaveResponse>(`${apiUrl}/save`, requestData, config);
   return res.data;
 };
 
@@ -39,6 +38,6 @@ export const voiceSave = async (param: File | FormData): Promise<VoiceApi.SaveRe
  */
 export const voicePage = async (param: PageParams): Promise<VoiceApi.PageResponse> => {
   const searchParams = new URLSearchParams(param as any);
-  const { data } = await request.get<VoiceApi.PageResponse>(getApiUrl(`${apiUrl}/page?${searchParams}`));
+  const { data } = await request.get<VoiceApi.PageResponse>(`${apiUrl}/page?${searchParams}`);
   return data;
 };

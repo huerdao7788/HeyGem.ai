@@ -1,6 +1,7 @@
 import request from './request';
 import { ApiResponse, Model, ModelApi, PageParams } from './types';
-import { getApiUrl } from '../utils/url';
+
+const apiUrl = '/v1/model';
 
 /**
  * 模特分页查询
@@ -9,7 +10,7 @@ import { getApiUrl } from '../utils/url';
  */
 export const modelPage = async (param: PageParams): Promise<ModelApi.PageResponse> => {
   const searchParams = new URLSearchParams(param as any);
-  const { data } = await  request.get(getApiUrl(`/v1/model/page?${searchParams}`));
+  const { data } = await request.get(`${apiUrl}/page?${searchParams}`);
   return data;
 };
 
@@ -20,7 +21,7 @@ export const modelPage = async (param: PageParams): Promise<ModelApi.PageRespons
  */
 export const modelCount = async (param: ModelApi.CountRequest): Promise<ApiResponse<ModelApi.CountResponse>> => {
   const searchParams = new URLSearchParams(param as any);
-  return request.get(getApiUrl(`/v1/model/count?${searchParams}`));
+  return request.get(`${apiUrl}/count?${searchParams}`);
 };
 
 /**
@@ -59,7 +60,7 @@ export const modelAdd = async (param: ModelApi.AddRequest | FormData): Promise<A
     };
   }
 
-  return request.post(getApiUrl(`/v1/model/add`), requestData, config);
+  return request.post(`${apiUrl}/add`, requestData, config);
 };
 
 /**
@@ -69,7 +70,7 @@ export const modelAdd = async (param: ModelApi.AddRequest | FormData): Promise<A
  */
 export const modelFind = async (param: ModelApi.FindRequest): Promise<ApiResponse<ModelApi.FindResponse>> => {
   const searchParams = new URLSearchParams(param as any);
-  return request.get(getApiUrl(`/v1/model/find?${searchParams}`));
+  return request.get(`${apiUrl}/find?${searchParams}`);
 };
 
 /**
@@ -79,5 +80,5 @@ export const modelFind = async (param: ModelApi.FindRequest): Promise<ApiRespons
  */
 export const modelDel = async (param: ModelApi.DeleteRequest): Promise<ApiResponse<any>> => {
   const searchParams = new URLSearchParams(param as any);
-  return request.delete(getApiUrl(`/v1/model/del?${searchParams}`));
+  return request.delete(`${apiUrl}/del?${searchParams}`);
 };
