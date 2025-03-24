@@ -20,24 +20,41 @@
     </div>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { reactive } from 'vue'
 import ImageShotVideo from '@renderer/assets/images/create-model/image-shot.png'
 import { Client } from '@renderer/client'
 import { MessagePlugin } from 'tdesign-vue-next'
-
 import { useI18n } from 'vue-i18n'
 import { handlePath } from '@renderer/utils'
 
-const { t } = useI18n()
-const uploadInfo = defineModel()
+// 定义上传信息类型
+interface UploadInfo {
+  videoPath?: string;
+  videoFile?: File;
+}
 
-const state = reactive({
+// 定义视频检查信息类型
+interface VideoCheckInfo {
+  isOK: boolean;
+  msg?: string;
+  duration?: number;
+}
+
+// 定义组件状态类型
+interface ComponentState {
+  isUploading: boolean;
+}
+
+const { t } = useI18n()
+const uploadInfo = defineModel<UploadInfo>()
+
+const state = reactive<ComponentState>({
   isUploading: false
 })
 
 const action = {
-  async upload() {
+  async upload(): Promise<void> {
     const fileObj = await Client.file.selectVideo()
     if (fileObj) {
       state.isUploading = true
@@ -45,8 +62,15 @@ const action = {
         // 创建视频预览URL
         const videoURL = URL.createObjectURL(fileObj)
         // 保存文件对象和URL到表单数据
-        uploadInfo.value.videoPath = videoURL
-        uploadInfo.value.videoFile = fileObj
+        if (uploadInfo.value) {
+          uploadInfo.value.videoPath = videoURL
+          uploadInfo.value.videoFile = fileObj
+        } else {
+          uploadInfo.value = {
+            videoPath: videoURL,
+            videoFile: fileObj
+          }
+        }
 
         // 等待一小段时间以确保UI刷新
         await new Promise(resolve => setTimeout(resolve, 300))
@@ -61,12 +85,12 @@ const action = {
       }
     }
   },
-  check(videoInfo) {
+  check(videoInfo: VideoCheckInfo): boolean {
     if (!videoInfo.isOK) {
       MessagePlugin.error(videoInfo.msg || t('common.message.videoUploadError'))
       return false
     }
-    if (videoInfo.duration < 8) {
+    if (videoInfo.duration && videoInfo.duration < 8) {
       MessagePlugin.error(t('common.message.videoLength'))
       return false
     }

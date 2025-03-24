@@ -17,11 +17,26 @@
     </div>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import ModalBoxUpload from './ModalBoxUpload.vue'
 import ModalBoxGuide from './ModalBoxGuide.vue'
 
-const form = defineModel({ uploadInfo: {}, name: '' })
+// 定义表单类型
+interface FormState {
+  uploadInfo: {
+    videoPath?: string;
+    videoFile?: File;
+  };
+  name: string;
+}
+
+// 使用defineModel并指定类型
+const form = defineModel<FormState>({
+  default: {
+    uploadInfo: {},
+    name: ''
+  }
+})
 </script>
 <style lang="less" scoped>
 .form {

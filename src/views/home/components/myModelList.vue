@@ -103,7 +103,7 @@
     <DeleteDialog ref="deleteDialogRef" @ok="okDelete" />
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { reactive, onMounted, ref } from 'vue'
 import { DeleteIcon } from 'tdesign-icons-vue-next'
 import { modelPage, removeModel } from '@renderer/api/index'
@@ -117,10 +117,52 @@ import { createModel } from '@renderer/components/model-create'
 import enConfig from 'tdesign-vue-next/es/locale/en_US'
 import zhConfig from 'tdesign-vue-next/es/locale/zh_CN'
 import { useI18n } from 'vue-i18n'
+import merge from 'lodash/merge'
+
+// 定义模型项接口
+interface ModelItem {
+  id: string
+  name: string
+  videoPath: string
+  createdAt: string | number
+  [key: string]: any
+}
+
+// 定义查询参数接口
+interface QueryParams {
+  page: number
+  pageSize: number
+  name: string
+}
+
+// 定义API响应接口
+interface ModelPageResponse {
+  total: number
+  list: ModelItem[]
+}
+
+// 定义组件状态接口
+interface ComponentState {
+  current: number
+  pageSize: number
+  total: number
+  videoUrl: string
+  showVideoDialog: boolean
+  isTime: boolean
+  modelList: ModelItem[]
+  delModelId: string
+  formData: {
+    name: string
+  }
+  tabList: {
+    name: string
+    active: boolean
+    id: string
+  }[]
+  tabValue: string
+}
 
 const { locale, t } = useI18n()
-
-import merge from 'lodash/merge'
 
 const globalEn = merge(enConfig, {
   pagination: {}
@@ -130,15 +172,15 @@ const globalZh = merge(zhConfig, {
 })
 const home = useHomeStore()
 const router = useRouter()
-const deleteDialogRef = ref(null)
-const state = reactive({
+const deleteDialogRef = ref<InstanceType<typeof DeleteDialog> | null>(null)
+const state = reactive<ComponentState>({
   current: 1,
   pageSize: 10,
   total: 0,
   videoUrl: '',
   showVideoDialog: false,
   isTime: false,
-  modelList: [], // 模型列表[],
+  modelList: [], // 模型列表
   delModelId: '',
   formData: {
     name: ''
@@ -157,18 +199,22 @@ const state = reactive({
   ],
   tabValue: 'recentlyUsed'
 })
+
 onMounted(() => {
   modelPageAJax()
 })
-const modelPageAJax = async () => {
+
+const modelPageAJax = async (): Promise<void> => {
   try {
-    const res = await modelPage({
+    const params: QueryParams = {
       page: state.current,
       pageSize: state.pageSize,
       name: state.formData.name
-    })
+    }
+
+    const res = await modelPage(params)
     if (res) {
-      const { total, list } = res
+      const { total, list } = res as ModelPageResponse
       if (list) {
         state.total = total
         state.modelList = list
@@ -178,14 +224,16 @@ const modelPageAJax = async () => {
     console.log(error)
   }
 }
-const handleCreateModel = async () => {
+
+const handleCreateModel = async (): Promise<void> => {
   const { isSubmitOK } = await createModel()
   // 提交成功
   if (isSubmitOK) {
     emit('submitOK')
   }
 }
-const okDelete = () => {
+
+const okDelete = (): void => {
   removeModel(state.delModelId)
     .then(() => {
       modelPageAJax()
@@ -197,23 +245,29 @@ const okDelete = () => {
       console.error('Error:', error)
     })
 }
-const delModel = (id) => {
+
+const delModel = (id: string): void => {
   if (deleteDialogRef.value && deleteDialogRef.value.showDialogFun) {
     deleteDialogRef.value.showDialogFun()
     state.delModelId = id
   }
 }
+
+// 定义组件暴露的方法
 defineExpose({
   modelPageAJax
 })
-const previewVideo = (url) => {
+
+const previewVideo = (url: string): void => {
   state.showVideoDialog = true
   state.videoUrl = url
 }
-const cancelFun = () => {
+
+const cancelFun = (): void => {
   state.showVideoDialog = false
 }
-const onKeypressFun = () => {
+
+const onKeypressFun = (): void => {
   if (!state.isTime) {
     state.isTime = true
     const timeout = setTimeout(() => {
@@ -223,19 +277,22 @@ const onKeypressFun = () => {
     }, 800)
   }
 }
-const editVideo = (item) => {
+
+const editVideo = (item: ModelItem): void => {
   router.push('/video/edit?modelId=' + item.id)
 }
-const onPageSizeChange = (size) => {
+
+const onPageSizeChange = (size: number): void => {
   state.pageSize = size
   modelPageAJax()
 }
 
-const onCurrentChange = (index) => {
-  state.page = index
+const onCurrentChange = (index: number): void => {
+  state.current = index
   modelPageAJax()
 }
-const tabClick = (index) => {
+
+const tabClick = (index: number): void => {
   state.tabList.forEach((yItem, yIndex) => {
     if (index === yIndex) {
       yItem.active = true
@@ -245,6 +302,8 @@ const tabClick = (index) => {
     }
   })
 }
+
+const emit = defineEmits(['submitOK'])
 </script>
 <style lang="less" scoped>
 .model-content-box {

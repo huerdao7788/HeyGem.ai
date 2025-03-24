@@ -18,31 +18,49 @@
   </div>
   <ModalFinished ref="modalFinished" />
 </template>
-<script setup>
+<script setup lang="ts">
 import { reactive, watchEffect, ref } from 'vue'
 import ModalBox from './ModalBox.vue'
 import ModalFinished from '../ModalFinished.vue'
 import { isBoolean, isObject } from 'lodash-es'
 import { addModel } from '@renderer/api'
 import { MessagePlugin } from 'tdesign-vue-next'
-const props = defineProps({
-  visible: {
-    type: Boolean,
-    default: false
-  },
-  onClose: {
-    type: Function,
-    default: () => {}
-  },
-  onClosed: {
-    type: Function,
-    default: () => {}
+import { ModelCreateResult } from './index'
+
+// 定义组件属性类型
+interface Props {
+  visible?: boolean
+  onClose?: (result: ModelCreateResult) => void
+  onClosed?: () => void
+}
+
+// 定义表单数据类型
+interface FormState {
+  uploadInfo: {
+    videoPath: string
+    videoFile?: File
   }
+  name: string
+}
+
+// 定义组件状态类型
+interface ComponentState {
+  show: boolean
+  loading: {
+    submit: boolean
+  }
+  form: FormState
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  visible: false,
+  onClose: () => {},
+  onClosed: () => {}
 })
 
-const modalFinished = ref(null)
+const modalFinished = ref<InstanceType<typeof ModalFinished> | null>(null)
 
-const state = reactive({
+const state = reactive<ComponentState>({
   show: false,
   loading: {
     submit: false
@@ -60,7 +78,7 @@ watchEffect(() => {
 })
 
 const action = {
-  check() {
+  check(): boolean {
     const { name, uploadInfo } = state.form
     if (!name) {
       MessagePlugin.error('请输入模特名称')
@@ -72,7 +90,7 @@ const action = {
     }
     return true
   },
-  async submit() {
+  async submit(): Promise<void> {
     if (!action.check()) return
     state.loading.submit = true
     const { name, uploadInfo } = state.form
@@ -84,19 +102,19 @@ const action = {
         videoPath: videoData
       })
       if (isOK) {
-        const isToSee = await modalFinished.value.show()
+        const isToSee = await modalFinished.value?.show()
         action.close({ isSubmitOK: true, isSubmitOK_toSee: isToSee })
       } else {
         throw new Error('制作失败~')
       }
     } catch (err) {
-      MessagePlugin.error(err.toString() || '制作失败~')
+      MessagePlugin.error((err as Error).toString() || '制作失败~')
     } finally {
       state.loading.submit = false
     }
   },
-  close(params = false) {
-    const result = {
+  close(params: boolean | Partial<ModelCreateResult> = false): void {
+    const result: ModelCreateResult = {
       isSubmitOK: false,
       isSubmitOK_toSee: false
     }

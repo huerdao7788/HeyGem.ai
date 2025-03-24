@@ -28,7 +28,7 @@
     </div>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import BannerList from "@renderer/views/home/components/bannerList.vue";
 import WorksList from "@renderer/views/home/components/worksList.vue";
 import MyModelList from "@renderer/views/home/components/myModelList.vue";
@@ -38,11 +38,28 @@ import { countVideo, countModel } from "@renderer/api/index";
 import { useRoute } from "vue-router";
 import { useI18n } from 'vue-i18n'
 import { devTools } from "@renderer/api/index";
+
+// 定义标签项接口
+interface TabItem {
+  key: string
+  name: string
+  active: boolean
+  id: string
+}
+
+// 定义状态接口
+interface HomeState {
+  tabList: TabItem[]
+  teType: string
+  tabValue: string
+}
+
 const { t, locale } = useI18n()
 const unRoute = useRoute();
 const home = useHomeStore();
-const myModelListRef = ref(null);
-const state = reactive({
+const myModelListRef = ref<InstanceType<typeof MyModelList> | null>(null);
+
+const state = reactive<HomeState>({
   tabList: [
     {
       key: 'common.tab.myWorksText',
@@ -63,15 +80,19 @@ const state = reactive({
 
 onMounted(() => {
   const { type } = unRoute.query;
-  state.teType = type;
-  if (type === "model") state.tabValue = "myModelList";
+  if (typeof type === 'string') {
+    state.teType = type;
+    if (type === "model") state.tabValue = "myModelList";
+  }
   countTotal();
 });
+
 watch(locale, () => {
   state.tabList.forEach((el) => {
     el.name = t(el.key)
   })
 })
+
 watch(
   () => state.tabValue,
   (tabValue) => {
@@ -84,17 +105,20 @@ watch(
     });
   }
 );
-const submitOKFun = () => {
+
+const submitOKFun = (): void => {
   state.tabValue = "myModelList";
   countTotal();
   if (myModelListRef.value && myModelListRef.value.modelPageAJax) {
     myModelListRef.value.modelPageAJax();
   }
 };
-const debug = () => {
+
+const debug = (): void => {
   devTools.send("open-devtools");
 };
-const tabClick = (index) => {
+
+const tabClick = (index: number): void => {
   state.tabList.forEach((yItem, yIndex) => {
     if (index === yIndex) {
       yItem.active = true;
@@ -105,7 +129,7 @@ const tabClick = (index) => {
   });
 };
 
-const countTotal = async () => {
+const countTotal = async (): Promise<void> => {
   try {
     const res = await countVideo();
     if (res) {

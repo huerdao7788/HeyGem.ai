@@ -41,7 +41,7 @@ export function findVideo(id: number) {
  * @param id 视频ID
  * @returns 删除结果
  */
-export function removeVideo(id: number) {
+export function removeVideo(id: number | string) {
   return videoService.removeVideo(id);
 }
 
@@ -137,7 +137,7 @@ export function countModel(name = '') {
  * @param id 模特ID
  * @returns 删除结果
  */
-export function removeModel(id: number) {
+export function removeModel(id: number| string) {
   return modelService.removeModel(id);
 }
 

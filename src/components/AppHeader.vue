@@ -48,15 +48,28 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { reactive, watch } from 'vue'
 import { useHomeStore } from '@renderer/stores/home'
 import { useI18n } from 'vue-i18n'
 import { agreementKey, lang_ } from '@renderer/utils/const'
 
+// 定义菜单项接口
+interface MenuItem {
+  content: string
+  key: string
+  value: string
+  children?: MenuItem[]
+}
+
+// 定义组件状态接口
+interface HeaderState {
+  menuList: MenuItem[]
+}
+
 const { locale, t } = useI18n()
 const home = useHomeStore()
-const state = reactive({
+const state = reactive<HeaderState>({
   menuList: [
     {
       content: '用户协议',
@@ -82,14 +95,16 @@ const state = reactive({
     }
   ]
 })
+
 watch(locale, () => {
   state.menuList.forEach((el) => {
     el.content = t(el.key)
     if (el.children) el.children.forEach((item) => (item.content = t(item.key)))
   })
 })
+
 const action = {
-  clickHandler({ value }) {
+  clickHandler({ value }: { value: string }): void {
     if (value === 'agreement') {
       home.setAgreementVisible(true)
     } else {
@@ -101,7 +116,8 @@ const action = {
     }
   }
 }
-const saveContextAjax = async (lang) => {
+
+const saveContextAjax = async (lang: string): Promise<void> => {
   localStorage.setItem(lang_, lang)
 }
 </script>

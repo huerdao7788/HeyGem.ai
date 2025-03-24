@@ -24,53 +24,61 @@
             variant="outline"
             @click="action.close(true)"
             >{{
-              leftBtnText === ''
+              props.leftBtnText === ''
                 ? $t('common.selectView.modalFinishedObj.progressBtnText')
-                : leftBtnText
+                : props.leftBtnText
             }}</t-button
           >
           <t-button class="btn iknow" @click="action.close(false)">{{
-            rightBtnText === '' ? $t('common.selectView.modalFinishedObj.okBtnText') : rightBtnText
+            props.rightBtnText === '' ? $t('common.selectView.modalFinishedObj.okBtnText') : props.rightBtnText
           }}</t-button>
         </div>
       </div>
     </t-dialog>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { reactive } from 'vue'
 import ImageSuccessSolid from '@renderer/assets/images/icons/icon-success-solid.png'
 
-defineProps({
-  leftBtnText: {
-    type: String,
-    default: ''
-  },
-  rightBtnText: {
-    type: String,
-    default: ''
-  }
+// 定义组件属性接口
+interface ModalFinishedProps {
+  leftBtnText: string
+  rightBtnText: string
+}
+
+// 定义组件状态接口
+interface ModalFinishedState {
+  visible: boolean
+}
+
+const props = withDefaults(defineProps<ModalFinishedProps>(), {
+  leftBtnText: '',
+  rightBtnText: ''
 })
 
-const state = reactive({
+const state = reactive<ModalFinishedState>({
   visible: false
 })
 
-let resolver = () => {}
+let resolver = (value: boolean): void => {}
 
 const action = {
-  show() {
+  show(): Promise<boolean> {
     state.visible = true
-    return new Promise((resolve) => {
+    return new Promise<boolean>((resolve) => {
       resolver = resolve
     })
   },
-  close(isToSee = false) {
+  close(isToSee: boolean = false): void {
     state.visible = false
     resolver(isToSee)
   }
 }
-defineExpose({
+
+defineExpose<{
+  show: () => Promise<boolean>
+}>({
   show: action.show
 })
 </script>

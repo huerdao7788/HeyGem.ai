@@ -23,18 +23,20 @@
     </div>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { createModel } from "@renderer/components/model-create";
 import { useRouter } from "vue-router";
 import { useI18n } from 'vue-i18n'
+
 const { locale } = useI18n()
 const router = useRouter();
-const emit = defineEmits(["SubmitOK"]);
+const emit = defineEmits(['submitOK']);
+
 const action = {
-  async handleCreateVideo() {
+  async handleCreateVideo(): Promise<void> {
     router.push("/video/edit");
   },
-  async handleCreateModel() {
+  async handleCreateModel(): Promise<void> {
     const { isSubmitOK } = await createModel();
     // 提交成功
     if (isSubmitOK) {

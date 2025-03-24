@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import MenuLIst from '@renderer/components/menuLIst.vue'
 import { handleShowMenu } from '@renderer/utils/index.js'
 import AppHeader from '@renderer/components/AppHeader.vue'

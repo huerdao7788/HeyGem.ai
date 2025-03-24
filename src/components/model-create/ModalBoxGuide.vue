@@ -26,7 +26,7 @@
     </div>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { onMounted, reactive, watch } from 'vue'
 import ImageFaceMore from '@renderer/assets/images/create-model/image-more-face.png'
 import ImageFaceBig from '@renderer/assets/images/create-model/image-big-face.png'
@@ -38,19 +38,36 @@ import ImageStand from '@renderer/assets/images/create-model/image-stand.png'
 import ImageSitEn from '@renderer/assets/images/create-model/image-sit-en.svg'
 import ImageStandEn from '@renderer/assets/images/create-model/image-stand-en.svg'
 import { useI18n } from 'vue-i18n'
+
+// 定义示例项类型
+interface DemoItem {
+  img: string;
+  text: string;
+  key?: string;
+}
+
+// 定义组件状态类型
+interface ComponentState {
+  noDemoList: DemoItem[];
+  okDemoList: DemoItem[];
+}
+
 const { t, locale } = useI18n()
-const okDemoListObj = [
+
+// 定义示例列表
+const okDemoListObj: DemoItem[] = [
   {
     img: locale.value === 'zh' ? ImageStand : ImageStandEn,
     text: '站姿参考'
   },
   {
-    img:  locale.value === 'zh' ? ImageSit : ImageSitEn,
+    img: locale.value === 'zh' ? ImageSit : ImageSitEn,
     text: '坐姿参考'
   }
 ]
 
-const obj = [
+// 定义错误示例列表
+const noDemoListObj: DemoItem[] = [
   {
     img: ImageFaceMore,
     key: 'common.modelCreateView.faceMore',
@@ -72,23 +89,31 @@ const obj = [
     text: '五官遮挡'
   }
 ]
-const state = reactive({
-  noDemoList: obj,
+
+// 组件状态
+const state = reactive<ComponentState>({
+  noDemoList: noDemoListObj,
   okDemoList: okDemoListObj
 })
-const init = () => {
-  state.noDemoList.forEach((el, index) => {
-    el.text = t(el.key)
+
+// 初始化方法，更新文本国际化
+const init = (): void => {
+  state.noDemoList.forEach((el) => {
+    if (el.key) {
+      el.text = t(el.key)
+    }
   })
 }
+
+// 监听语言变化
 watch(locale, () => {
   init()
 })
+
+// 组件挂载时初始化
 onMounted(() => {
   init()
 })
-
-
 </script>
 <style lang="less" scoped>
 .guide {

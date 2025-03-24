@@ -9,7 +9,7 @@
       />
       <template v-if="locale === 'zh'">
         <div class="page-title bold">授权及承诺书</div>
-        <div ref="agreementRef" class="agreement" @scroll="scrollAgreement">
+        <div ref="agreementRef" class="agreement">
           <div class="text marg">
             本软件产品(包括但不限于软件程序、代码、界面设计、图像、音频、视频、文档等)的知识产权归_(以下简称"我们")或其许可方所有。未经我们的书面许可，您不得以任何方式复制、修改、传播、出售、出租、出借、分发、反向工程、反编译或以其他方式对本软件产品进行侵权行为。
           </div>
@@ -90,7 +90,7 @@
       </template>
       <template v-else>
         <div class="page-title bold">Authorization and Commitment Letter</div>
-        <div ref="agreementRef" class="agreement" @scroll="scrollAgreement">
+        <div ref="agreementRef" class="agreement">
           <div class="text marg">
             The intellectual property rights of this software product (including but not limited to
             software programs, codes, interface designs, images, audio, video, documents, etc.)
@@ -273,28 +273,35 @@
     </div>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { useHomeStore } from '@renderer/stores/home'
 import { useI18n } from 'vue-i18n'
 import { agreementKey } from '@renderer/utils/const'
 
+// 定义Props接口
+interface AgreementProps {
+  modelValue: boolean
+}
+
+// 定义Emits接口
+interface AgreementEmits {
+  (e: 'update:modelValue', value: boolean): void
+  (e: 'change', value: boolean): void
+}
+
 const { locale } = useI18n()
 const home = useHomeStore()
-defineProps({
-  modelValue: {
-    type: Boolean,
-    default: false
-  }
-})
-const agreementRef = ref(null)
-const emit = defineEmits(['update:modelValue', 'change'])
+defineProps<AgreementProps>()
+const agreementRef = ref<HTMLElement | null>(null)
+const emit = defineEmits<AgreementEmits>()
 
-const onAgree = () => {
+
+const onAgree = (): void => {
   close()
 }
 
-const close = async () => {
+const close = async (): Promise<void> => {
   try {
     localStorage.setItem(agreementKey, 'true')
     home.setIsAgree(true)

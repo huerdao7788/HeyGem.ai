@@ -154,7 +154,7 @@
     <DeleteDialog ref="deleteDialogRef" @ok="okDelete" />
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { reactive, onMounted, onBeforeUnmount, ref } from 'vue'
 import { DeleteIcon } from 'tdesign-icons-vue-next'
 import { videoPage, removeVideo } from '@renderer/api/index'
@@ -167,9 +167,59 @@ import { MessagePlugin } from 'tdesign-vue-next'
 import enConfig from 'tdesign-vue-next/es/locale/en_US'
 import zhConfig from 'tdesign-vue-next/es/locale/zh_CN'
 import { useI18n } from 'vue-i18n'
+import merge from 'lodash/merge'
+
+// 定义视频项接口
+interface VideoItem {
+  id: string
+  name: string
+  filePath?: string
+  videoPath?: string
+  status: 'success' | 'failed' | 'pending' | 'waiting' | 'draft'
+  duration?: number
+  progress?: number
+  message?: string
+  createdAt?: string | number
+  [key: string]: any
+}
+
+// 定义查询参数接口
+interface QueryParams {
+  page: number
+  pageSize: number
+  name: string
+}
+
+// 定义API响应接口
+interface VideoPageResponse {
+  total: number
+  list: VideoItem[]
+}
+
+// 定义组件状态接口
+interface ComponentState {
+  interval: ReturnType<typeof setInterval> | null
+  current: number
+  videoUrl: string
+  showVideoDialog: boolean
+  pageSize: number
+  total: number
+  delVideoId: string
+  worksList: VideoItem[]
+  url: string
+  isTime?: boolean
+  downloading?: Record<string, boolean>
+  downloadInfo?: {
+    videoId: string
+    visible: boolean
+  }
+  formData: {
+    name: string
+  }
+}
+
 const { locale, t } = useI18n()
 
-import merge from 'lodash/merge'
 const globalEn = merge(enConfig, {
   pagination: {}
 })
@@ -178,8 +228,8 @@ const globalZh = merge(zhConfig, {
 })
 const router = useRouter()
 const home = useHomeStore()
-const deleteDialogRef = ref(null)
-const state = reactive({
+const deleteDialogRef = ref<InstanceType<typeof DeleteDialog> | null>(null)
+const state = reactive<ComponentState>({
   interval: null,
   current: 1,
   videoUrl: '',
@@ -193,34 +243,44 @@ const state = reactive({
     name: ''
   }
 })
+
 onMounted(() => {
   videoPageAJax()
   state.interval = setInterval(() => {
     videoPageAJax()
   }, 3000)
 })
+
 onBeforeUnmount(() => {
-  clearInterval(state.interval)
+  if (state.interval) {
+    clearInterval(state.interval)
+  }
 })
-const cancelFun = () => {
+
+const cancelFun = (): void => {
   state.showVideoDialog = false
 }
-const linkRoute = () => {
+
+const linkRoute = (): void => {
   router.push('/video/edit')
 }
-const previewVideo = (url) => {
+
+const previewVideo = (url: string): void => {
   state.showVideoDialog = true
   state.videoUrl = url
 }
-const videoPageAJax = async () => {
+
+const videoPageAJax = async (): Promise<void> => {
   try {
-    const res = await videoPage({
+    const params: QueryParams = {
       page: state.current,
       pageSize: state.pageSize,
       name: state.formData.name
-    })
+    }
+
+    const res = await videoPage(params)
     if (res) {
-      const { total, list } = res
+      const { total, list } = res as VideoPageResponse
       if (list) {
         state.total = total
         state.worksList = list
@@ -230,7 +290,8 @@ const videoPageAJax = async () => {
     console.log(error)
   }
 }
-const onKeypressFun = () => {
+
+const onKeypressFun = (): void => {
   if (!state.isTime) {
     state.isTime = true
     const timeout = setTimeout(() => {
@@ -240,24 +301,25 @@ const onKeypressFun = () => {
     }, 800)
   }
 }
-const onPageSizeChange = (size) => {
+
+const onPageSizeChange = (size: number): void => {
   state.pageSize = size
   videoPageAJax()
 }
 
-const onCurrentChange = (index) => {
-  state.page = index
+const onCurrentChange = (index: number): void => {
+  state.current = index
   videoPageAJax()
 }
 
-const delVideo = (id) => {
-  console.log("🚀 ~ delVideo ~ id:", id)
+const delVideo = (id: string): void => {
   if (deleteDialogRef.value && deleteDialogRef.value.showDialogFun) {
     deleteDialogRef.value.showDialogFun()
     state.delVideoId = id
   }
 }
-const okDelete = () => {
+
+const okDelete = (): void => {
   removeVideo(state.delVideoId)
     .then(() => {
       videoPageAJax()
@@ -269,7 +331,8 @@ const okDelete = () => {
       console.error('Error:', error)
     })
 }
-const downloadVideo = async (video) => {
+
+const downloadVideo = async (video: VideoItem): Promise<void> => {
   try {
     // 检查视频路径是否有效
     if (!video.filePath) {
@@ -308,7 +371,7 @@ const downloadVideo = async (video) => {
       delete state.downloading[video.id]
     }
   } catch (error) {
-    MessagePlugin.error(error.message || t('common.message.downloadErrorText'))
+    MessagePlugin.error((error as Error).message || t('common.message.downloadErrorText'))
   }
 }
 </script>

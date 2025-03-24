@@ -22,16 +22,21 @@
     </t-dialog>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { handlePath } from '@renderer/utils'
-const emit = defineEmits(["cancel"]);
-const props = defineProps({
-  showVideoDialog: Boolean,
-  videoUrl: String,
-});
-const videoPlayer = ref(null);
-const cancelUploda = () => {
+
+// 定义Props接口
+interface VideoDialogProps {
+  showVideoDialog: boolean
+  videoUrl: string
+}
+
+const emit = defineEmits(['cancel']);
+const props = defineProps<VideoDialogProps>();
+const videoPlayer = ref<HTMLVideoElement | null>(null);
+
+const cancelUploda = (): void => {
   emit("cancel");
   if (videoPlayer.value) {
     videoPlayer.value.pause();

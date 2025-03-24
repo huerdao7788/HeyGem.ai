@@ -30,22 +30,38 @@
     </t-dialog>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
-const emit = defineEmits(['cancel', 'ok'])
-const showDialog = ref(false)
-const cancelUpload = () => {
+
+// 定义emit类型
+interface DeleteDialogEmits {
+  (e: 'cancel'): void
+  (e: 'ok'): void
+}
+
+// 定义暴露的方法类型
+interface DeleteDialogExpose {
+  showDialogFun: () => void
+}
+
+const emit = defineEmits<DeleteDialogEmits>()
+const showDialog = ref<boolean>(false)
+
+const cancelUpload = (): void => {
   showDialog.value = false
   emit('cancel')
 }
-const showDialogFun = () => {
+
+const showDialogFun = (): void => {
   showDialog.value = true
 }
-const okFun = () => {
+
+const okFun = (): void => {
   showDialog.value = false
   emit('ok')
 }
-defineExpose({
+
+defineExpose<DeleteDialogExpose>({
   showDialogFun
 })
 </script>
