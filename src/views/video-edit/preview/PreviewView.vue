@@ -7,6 +7,7 @@
   </div>
 </template>
 <script setup>
+import { Loading as TLoading } from 'tdesign-vue-next';
 
 defineProps({
   model: {
@@ -49,6 +50,14 @@ defineProps({
       max-width: 100%;
       max-height: 100%;
       border-radius: 4px;
+    }
+
+    .loading-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
     }
   }
 }

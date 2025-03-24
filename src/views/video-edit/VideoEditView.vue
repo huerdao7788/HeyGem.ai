@@ -3,7 +3,6 @@
     <t-header class="layout-header">
       <Header :on-submit="action.submit" :on-save="action.save" v-model="state.video" />
     </t-header>
-    <t-loading text="加载中..." :loading="state.initLoading" :showOverlay="false">
       <t-layout class="layout-body">
         <!-- <t-aside width="50px">Aside</t-aside> -->
         <t-content class="layout-content">
@@ -20,7 +19,6 @@
           </t-row>
         </t-content>
       </t-layout>
-    </t-loading>
   </t-layout>
   <ModalFinished ref="modalFinished" :right-btn-text="$t('common.selectView.modalFinishedObj.rightBtnText')">
     {{ $t('common.selectView.modalFinishedObj.text1')
