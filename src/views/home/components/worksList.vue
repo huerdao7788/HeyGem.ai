@@ -157,7 +157,7 @@
 <script setup>
 import { reactive, onMounted, onBeforeUnmount, ref } from 'vue'
 import { DeleteIcon } from 'tdesign-icons-vue-next'
-import { videoPage, removeVideo } from '@renderer/api/index.js'
+import { videoPage, removeVideo } from '@renderer/api/index'
 import { formatDate, handlePath, millisecondsToTime } from '@renderer/utils/index.js'
 import VideoDialog from '@renderer/views/home/components/videoDialog.vue'
 import { useHomeStore } from '@renderer/stores/home.js'

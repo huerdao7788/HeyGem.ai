@@ -2,7 +2,8 @@
   <div class="video-dialog-box">
     <t-dialog
       :width="400"
-      v-model:visible="props.showVideoDialog"
+      v-if="props.showVideoDialog"
+      :visible="props.showVideoDialog"
       top="10vh"
       :on-close="cancelUploda"
     >
@@ -32,7 +33,9 @@ const props = defineProps({
 const videoPlayer = ref(null);
 const cancelUploda = () => {
   emit("cancel");
-  videoPlayer.value.pause();
+  if (videoPlayer.value) {
+    videoPlayer.value.pause();
+  }
 };
 </script>
 <style lang="less" scoped>

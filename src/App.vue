@@ -7,7 +7,7 @@ import { onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useHomeStore } from '@renderer/stores/home.js'
 import { useI18n } from 'vue-i18n'
-import { agreementKey, lang_ } from '@renderer/utils/const'
+import { agreementKey, lang_ } from '@/utils/const'
 
 const { locale } = useI18n()
 const unRoute = useRoute()

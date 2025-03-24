@@ -64,7 +64,6 @@ const action = {
     state.initLoading = true
     try {
       const { videoId, modelId } = route.query
-      console.log('init',modelId,videoId)
       action.initWatchs()
 
       // 初始化视频详情
@@ -147,7 +146,6 @@ const action = {
   },
   async initModelDetail(modelId) {
     const modelDetail = await findModel(modelId)
-    console.log('model',modelDetail)
     state.select.model = modelDetail
   },
   check() {

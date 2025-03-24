@@ -1,0 +1,44 @@
+import request from './request';
+import { ApiResponse, PageParams, VoiceApi } from './types';
+import { getApiUrl } from '../utils/url';
+
+const apiUrl = '/v1/voice';
+
+/**
+ * 保存语音
+ * @param param 保存参数
+ * @returns 保存结果
+ */
+export const voiceSave = async (param: File | FormData): Promise<VoiceApi.SaveResponse> => {
+  // 处理不同类型的参数
+  let requestData: any = param;
+
+  // 如果参数是File对象，转换为FormData
+  if (param instanceof File) {
+    const formData = new FormData();
+    formData.append('file', param);
+    requestData = formData;
+  }
+
+  // 添加Content-Type头部配置用于FormData请求
+  const config: { headers?: Record<string, string> } = {};
+  if (requestData instanceof FormData) {
+    config.headers = {
+      'Content-Type': 'multipart/form-data'
+    };
+  }
+
+  const res = await request.post<VoiceApi.SaveResponse>(getApiUrl(`${apiUrl}/save`), requestData, config);
+  return res.data;
+};
+
+/**
+ * 语音分页查询
+ * @param param 分页参数
+ * @returns 分页结果
+ */
+export const voicePage = async (param: PageParams): Promise<VoiceApi.PageResponse> => {
+  const searchParams = new URLSearchParams(param as any);
+  const { data } = await request.get<VoiceApi.PageResponse>(getApiUrl(`${apiUrl}/page?${searchParams}`));
+  return data;
+};
