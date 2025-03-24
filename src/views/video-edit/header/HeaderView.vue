@@ -96,7 +96,6 @@ const action = {
   align-items: center;
   padding: 0 20px 0 23px;
   -webkit-app-region: drag;
-  -webkit-user-select: none;
 
   &-left {
     display: flex;

@@ -2,14 +2,14 @@
   <div class="preview">
     <div class="preview-header">{{ $t('common.preview.headerText') }}</div>
     <div class="preview-body">
-      <video v-if="model.videoPath" class="video" controls :src="model.videoPath"></video>
+      <video v-if="model.videoPath" class="video" controls :src="handlePath(model.videoPath)"></video>
     </div>
   </div>
 </template>
 <script setup lang="ts">
 import { PropType } from 'vue';
 import { Loading as TLoading } from 'tdesign-vue-next';
-
+import { handlePath } from '@renderer/utils';
 // 定义模型接口
 interface ModelInfo {
   id?: string

@@ -121,11 +121,7 @@ export async function findModel(modelId: string | number): Promise<ModelItem> {
   // 确保ID是数字类型
   const id = typeof modelId === 'string' ? parseInt(modelId, 10) : modelId;
   const { data } = await modelFind({ id });
-  return {
-    ...data.item,
-    videoPath: getAssetUrl(data.item.videoPath),
-    audioPath: getAssetUrl(data.item.audioPath)
-  };
+  return data.item;
 }
 
 /**

@@ -1,19 +1,23 @@
 # 构建阶段
-FROM node:16 as build-stage
+FROM node:18 as build-stage
 
 WORKDIR /app
 
+# 设置pnpm
+RUN npm install -g pnpm@8.x
+
 # 复制依赖文件
-COPY package*.json ./
+COPY package.json pnpm-lock.yaml ./
+COPY .npmrc ./
 
 # 安装依赖
-RUN npm install
+RUN pnpm install
 
 # 复制源代码
 COPY . .
 
 # 构建应用
-RUN npm run build
+RUN pnpm run build
 
 # 生产阶段
 FROM nginx:stable-alpine as production-stage
