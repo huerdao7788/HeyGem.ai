@@ -64,12 +64,12 @@ interface AudioCheckResult {
 // 定义选择状态接口
 interface SelectState {
   model?: {
-    id?: string
+    id?: string| number
     name?: string
     [key: string]: any
   }
   speaker?: {
-    id?: string
+    id?: string| number
     name?: string
     [key: string]: any
   }
@@ -118,7 +118,6 @@ const action = {
         select.value.uploaded = {
           name: fileName,
           audioUrl: audioUrl,
-          fileObj: fileObj
         }
 
         const audio = new Audio(audioUrl)
@@ -163,8 +162,8 @@ const action = {
 
     state.audioLoading = true
     try {
-      if (select.value.uploaded?.fileObj) {
-        await voiceSave(select.value.uploaded.fileObj)
+      if (select.value.uploaded?.audioUrl) {
+        await voiceSave(select.value.uploaded.audioUrl,select.value.uploaded.name,"true")
       }
     } finally {
       state.audioLoading = false

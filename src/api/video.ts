@@ -65,7 +65,7 @@ export const videoFindByStatus = async (param: VideoApi.FindByStatusRequest): Pr
  * @param param 保存参数
  * @returns 保存结果
  */
-export const videoSave = async (param: VideoApi.SaveRequest): Promise<{ data: { id: number } }> => {
+export const videoSave = async (param: VideoApi.SaveRequest): Promise<{ id: number }> => {
   const { data } = await request.post(`${apiUrl}/save`, param);
   return data;
 };
@@ -76,7 +76,7 @@ export const videoSave = async (param: VideoApi.SaveRequest): Promise<{ data: { 
  * @returns 删除结果
  */
 export const videoDel = async (id: number): Promise<ApiResponse<any>> => {
-  const { data } = await request.delete(`${apiUrl}/delete?id=${id}`);
+  const { data } = await request.delete(`${apiUrl}/del/${id}`);
   return data;
 };
 

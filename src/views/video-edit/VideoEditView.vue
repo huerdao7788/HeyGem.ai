@@ -3,46 +3,47 @@
     <t-header class="layout-header">
       <Header :on-submit="action.submit" :on-save="action.save" v-model="state.video" />
     </t-header>
-      <t-layout class="layout-body">
-        <!-- <t-aside width="50px">Aside</t-aside> -->
-        <t-content class="layout-content">
-          <t-row class="content-row">
-            <t-col :flex="2.7">
-              <Select class="content-left" v-model="state.select" @query="action.queryModelList" />
-            </t-col>
-            <t-col :flex="4.5">
-              <Preview class="content-center" :model="state.select.model" />
-            </t-col>
-            <t-col :flex="5.0">
-              <Edit class="content-right" v-model="state.select" />
-            </t-col>
-          </t-row>
-        </t-content>
-      </t-layout>
+    <t-layout class="layout-body">
+      <!-- <t-aside width="50px">Aside</t-aside> -->
+      <t-content class="layout-content">
+        <t-row class="content-row">
+          <t-col :flex="2.7">
+            <Select class="content-left" v-model="state.select" @query="action.queryModelList" />
+          </t-col>
+          <t-col :flex="4.5">
+            <Preview class="content-center" :model="state.select.model" />
+          </t-col>
+          <t-col :flex="5.0">
+            <Edit class="content-right" v-model="state.select" />
+          </t-col>
+        </t-row>
+      </t-content>
+    </t-layout>
   </t-layout>
   <ModalFinished
     ref="modalFinished"
-    :right-btn-text="$t('common.selectView.modalFinishedObj.rightBtnText')">
+    :right-btn-text="$t('common.selectView.modalFinishedObj.rightBtnText')"
+  >
     {{ $t('common.selectView.modalFinishedObj.text1')
     }}<span style="color: #434af9"> {{ $t('common.selectView.modalFinishedObj.text2') }}</span>
     {{ $t('common.selectView.modalFinishedObj.text3') }}
   </ModalFinished>
 </template>
 <script setup lang="ts">
-import { ref, reactive, watch } from "vue";
+import { reactive, ref, watch } from 'vue'
 import Header from './header/HeaderView.vue'
 import Select from './select/SelectView.vue'
 import Preview from './preview/PreviewView.vue'
 import Edit from './edit/EditView.vue'
 import ModalFinished from '@renderer/components/ModalFinished.vue'
-import { saveVideo, makeVideo, findModel, findVideo, modelPage } from '@renderer/api'
+import { findModel, findVideo, makeVideo, modelPage, saveVideo } from '@renderer/api'
 import { useRoute, useRouter } from 'vue-router'
 import { MessagePlugin } from 'tdesign-vue-next'
 import { useI18n } from 'vue-i18n'
 
 // 定义模型接口
 interface ModelInfo {
-  id?: string
+  id?: string | number
   name?: string
   videoPath?: string
   voiceId?: string
@@ -60,6 +61,7 @@ interface SpeakerInfo {
 
 // 定义上传的音频
 interface UploadedAudio {
+  name?: string
   audioUrl?: string
   duration?: number
   [key: string]: any
@@ -67,7 +69,7 @@ interface UploadedAudio {
 
 // 定义视频属性
 interface VideoInfo {
-  id: string
+  id: string | number
   name: string
   [key: string]: any
 }
@@ -113,7 +115,7 @@ const state = reactive<ComponentState>({
     speaker: {},
     text: '',
     modelList: [],
-    uploaded: null,
+    uploaded: null
   }
 })
 
@@ -176,11 +178,11 @@ const action = {
   },
   async queryModelList(name: string = ''): Promise<void> {
     try {
-      const result = await modelPage({
+      const result = (await modelPage({
         name,
         page: 1,
         pageSize: 100
-      }) as ModelPageResponse
+      })) as ModelPageResponse
 
       state.select.modelList = result.list || []
     } catch (error) {
@@ -202,9 +204,8 @@ const action = {
       state.select.model.id = videoDetail.modelId
     }
   },
-  async initModelDetail(modelId: string): Promise<void> {
-    const modelDetail = await findModel(modelId)
-    state.select.model = modelDetail
+  async initModelDetail(modelId: string | number): Promise<void> {
+    state.select.model = await findModel(modelId)
   },
   check(): boolean {
     const { select, video } = state
@@ -246,18 +247,18 @@ const action = {
     const sumitAudio: Record<string, any> = {}
     if (select.uploaded?.audioUrl && !select.text) {
       sumitAudio.audioPath = select.uploaded.audioUrl
+      sumitAudio.audioName = select.uploaded.name
     } else {
       sumitAudio.voiceId = select.speaker.id
     }
 
     const saveId = await saveVideo({
-      id: video.id,
       modelId: select.model.id,
       name: video.name,
       textContent: select.text,
       ...sumitAudio
     })
-    return video.id || saveId
+    return (video.id || saveId).toString()
   },
   async make(videoId: string): Promise<boolean> {
     const makeId = await makeVideo(videoId)
@@ -280,9 +281,11 @@ action.init()
   }
 
   :deep(.t-loading__gradient-conic) {
-    background: conic-gradient(from 90deg at 50% 50%,
-        rgba(67, 74, 249, 0) 0deg,
-        rgb(255, 255, 255) 360deg) !important;
+    background: conic-gradient(
+      from 90deg at 50% 50%,
+      rgba(67, 74, 249, 0) 0deg,
+      rgb(255, 255, 255) 360deg
+    ) !important;
   }
 
   &-header {
@@ -304,7 +307,7 @@ action.init()
     height: 100%;
     align-items: unset;
 
-    &>* {
+    & > * {
       height: 100%;
     }
 

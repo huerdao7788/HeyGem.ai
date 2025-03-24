@@ -12,7 +12,7 @@ import { Loading as TLoading } from 'tdesign-vue-next';
 import { handlePath } from '@renderer/utils';
 // 定义模型接口
 interface ModelInfo {
-  id?: string
+  id?: string | number
   name?: string
   videoPath?: string
   [key: string]: any

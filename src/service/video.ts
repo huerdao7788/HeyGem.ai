@@ -43,7 +43,8 @@ interface SaveVideoParams {
   name?: string;
   textContent?: string;
   voiceId?: string | number;
-  audioPath?: string | File;
+  audioPath?: string;
+  audioName?: string;
   status?: string;
 }
 
@@ -98,36 +99,13 @@ export async function countVideo(name: string = ''): Promise<number> {
  * @returns 视频ID
  */
 export async function saveVideo(params: SaveVideoParams): Promise<string | number> {
-  const { id, modelId, name, textContent, voiceId, audioPath, status } = params;
+  const { id, modelId, name, textContent, voiceId, audioPath, audioName, status } = params;
   let finalVoiceId = voiceId;
   let finalAudioPath = audioPath;
 
   if (audioPath) {
-    // 处理不同类型的audioPath
-    if (audioPath instanceof File) {
-      // 如果是File对象，直接上传
-      let res = await saveAudio(audioPath);
-      finalVoiceId = res.id;
-      finalAudioPath = res.audioPath;
-    } else if (typeof audioPath === 'string') {
-      // 如果是URL（blob或data URL）
-      if (audioPath.startsWith('blob:') || audioPath.startsWith('data:')) {
-        let res = await saveAudio(audioPath);
-        finalVoiceId = res.id;
-        finalAudioPath = res.audioPath;
-      } else {
-        // 常规路径
-        let res = await saveAudio(audioPath);
-        finalVoiceId = res.id;
-        finalAudioPath = res.audioPath;
-      }
-    } else if (audioPath && typeof audioPath === 'object' && 'fileObj' in audioPath) {
-      // 兼容处理含有fileObj属性的对象
-      const fileObj = (audioPath as any).fileObj;
-      let res = await saveAudio(fileObj);
-      finalVoiceId = res.id;
-      finalAudioPath = res.audioPath;
-    }
+    let res = await saveAudio(audioPath, audioName,"false");
+    finalAudioPath = res.audioPath;
   }
 
   // 转换为API期望的类型
@@ -142,7 +120,7 @@ export async function saveVideo(params: SaveVideoParams): Promise<string | numbe
   };
 
   // 发送视频保存请求
-  const { data } = await videoSave(saveParams);
+  const data = await videoSave(saveParams);
   return data.id;
 }
 

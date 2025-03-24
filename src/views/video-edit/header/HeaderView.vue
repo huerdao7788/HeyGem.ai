@@ -37,7 +37,7 @@ import { useRouter } from 'vue-router'
 
 // 定义视频信息接口
 interface VideoInfo {
-  id?: string
+  id?: string | number
   name: string
   [key: string]: any
 }

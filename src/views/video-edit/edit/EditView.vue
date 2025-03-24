@@ -24,7 +24,7 @@ import EditText from './EditText.vue';
 // 定义选择状态接口
 interface SelectState {
   model: {
-    id?: string
+    id?: string | number
     name?: string
     [key: string]: any
   }

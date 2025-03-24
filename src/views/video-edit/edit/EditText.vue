@@ -36,7 +36,7 @@ import { audition } from '@renderer/api'
 
 // 定义音色接口
 interface SpeakerInfo {
-  id?: string
+  id?: string | number
   name?: string
   audioPath?: string
   [key: string]: any
@@ -45,7 +45,7 @@ interface SpeakerInfo {
 // 定义选择状态接口
 interface SelectState {
   model?: {
-    id?: string
+    id?: string | number
     name?: string
     [key: string]: any
   }
