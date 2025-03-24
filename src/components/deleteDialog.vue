@@ -2,7 +2,8 @@
   <div class="video-dialog-box">
     <t-dialog
       :width="480"
-      v-model:visible="showDialog"
+      v-if="showDialog"
+      :visible="showDialog"
       top="10vh"
       placement="center"
       :closeOnOverlayClick="false"
