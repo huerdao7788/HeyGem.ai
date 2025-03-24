@@ -124,7 +124,7 @@ interface ModelItem {
   id: string
   name: string
   videoPath: string
-  createdAt: string | number
+  createdAt: string | Date
   [key: string]: any
 }
 

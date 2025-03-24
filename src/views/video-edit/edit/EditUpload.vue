@@ -36,30 +36,78 @@
     </div>
   </div>
 </template>
-<script setup>
-import { reactive } from 'vue'
+<script setup lang="ts">
+import { reactive, PropType } from 'vue'
 import { AddIcon } from 'tdesign-icons-vue-next'
 import { millisecondsToTime } from '@renderer/utils'
 import { MessagePlugin } from 'tdesign-vue-next'
 import { Client } from '@renderer/client'
 import { voiceSave } from '@renderer/api'
 
+// 定义上传的音频信息接口
+interface UploadedAudio {
+  name?: string
+  audioUrl?: string
+  duration?: string | number
+  fileObj?: File
+  [key: string]: any
+}
+
+// 定义音频检查结果接口
+interface AudioCheckResult {
+  isOK: boolean
+  msg?: string
+  duration?: number
+  [key: string]: any
+}
+
+// 定义选择状态接口
+interface SelectState {
+  model?: {
+    id?: string
+    name?: string
+    [key: string]: any
+  }
+  speaker?: {
+    id?: string
+    name?: string
+    [key: string]: any
+  }
+  text?: string
+  uploaded?: UploadedAudio | null
+  [key: string]: any
+}
+
+// 定义组件状态接口
+interface ComponentState {
+  uploading: boolean
+  audioLoading: boolean
+}
+
+// 定义监听器接口
+interface Listener {
+  listen: (data: UploadedAudio) => void
+  close: () => void
+  current: () => { audioUrl: string, [key: string]: any }
+  [key: string]: any
+}
+
 const props = defineProps({
   listener: {
-    type: Object,
+    type: Object as PropType<Listener>,
     default: () => ({})
   }
 })
 
-const state = reactive({
+const state = reactive<ComponentState>({
   uploading: false,
   audioLoading: false
 })
 
-const select = defineModel({})
+const select = defineModel<SelectState>({})
 
 const action = {
-  async uploadAudio() {
+  async uploadAudio(): Promise<void> {
     const fileObj = await Client.file.selectAudio()
     if (fileObj) {
       state.uploading = true
@@ -75,7 +123,9 @@ const action = {
 
         const audio = new Audio(audioUrl)
         audio.addEventListener('loadedmetadata', () => {
-          select.value.uploaded.duration = millisecondsToTime(audio.duration * 1000)
+          if (select.value.uploaded) {
+            select.value.uploaded.duration = millisecondsToTime(audio.duration * 1000)
+          }
         })
       } catch (err) {
         console.error(err)
@@ -84,31 +134,31 @@ const action = {
       }
     }
   },
-  check(audioInfo) {
+  check(audioInfo: AudioCheckResult): boolean {
     if (!audioInfo.isOK) {
       MessagePlugin.error(audioInfo.msg || '音频上传失败')
       return false
     }
-    if (audioInfo.duration > 60 * 30) {
+    if (audioInfo.duration && audioInfo.duration > 60 * 30) {
       MessagePlugin.error('音频时长不能超过30分钟')
       return false
     }
     return true
   },
-  deleteAudio() {
+  deleteAudio(): void {
     const { audioUrl } = props.listener.current()
     if (audioUrl === select.value.uploaded?.audioUrl) {
       props.listener.close()
     }
     select.value.uploaded = null
   },
-  listen() {
+  listen(): void {
     if (!select.value.uploaded) return
     const { name, audioUrl, duration } = select.value.uploaded
 
     props.listener.listen({ name, audioUrl, duration })
   },
-  async save() {
+  async save(): Promise<void> {
     if (!select.value.uploaded) return
 
     state.audioLoading = true

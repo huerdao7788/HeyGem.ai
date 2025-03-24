@@ -29,7 +29,7 @@
     </div>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { reactive } from 'vue'
 import ModelPng from '@renderer/assets/images/video-edit/create-model.png'
 import { SearchIcon } from 'tdesign-icons-vue-next'
@@ -37,24 +37,48 @@ import { createModel } from '@renderer/components/model-create'
 import { useRouter } from 'vue-router'
 import { handlePath } from '@renderer/utils'
 
+// 定义模型接口
+interface ModelInfo {
+  id?: string
+  name?: string
+  videoPath?: string
+  voiceId?: string
+  audioPath?: string
+  [key: string]: any
+}
+
+// 定义选择状态接口
+interface SelectState {
+  model?: ModelInfo
+  modelList?: ModelInfo[]
+  [key: string]: any
+}
+
+// 定义组件状态接口
+interface ComponentState {
+  search: string
+}
+
 const router = useRouter()
 
-const data = defineModel({})
+const data = defineModel<SelectState>({})
 
-const state = reactive({
+const state = reactive<ComponentState>({
   search: ''
 })
 
-const emits = defineEmits(['query'])
+const emits = defineEmits<{
+  (e: 'query', search: string): void
+}>()
 
 const action = {
-  async searchList() {
+  async searchList(): Promise<void> {
     emits('query', state.search)
   },
-  selectModel(model) {
+  selectModel(model: ModelInfo): void {
     data.value.model = model
   },
-  async onCreateModel() {
+  async onCreateModel(): Promise<void> {
     const { isSubmitOK_toSee, isSubmitOK } = await createModel()
     if (isSubmitOK_toSee) {
       router.push('/home?type=model')

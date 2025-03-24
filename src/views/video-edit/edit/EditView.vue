@@ -15,28 +15,60 @@
     <EditListener ref="listener" />
   </div>
 </template>
-<script setup>
-import { computed, reactive, ref } from 'vue'
+<script setup lang="ts">
+import { computed, reactive, ref, ComputedRef } from 'vue'
 import EditListener from './EditListener.vue'
 import EditUpload from './EditUpload.vue';
 import EditText from './EditText.vue';
 
-const select = defineModel({})
+// 定义选择状态接口
+interface SelectState {
+  model: {
+    id?: string
+    name?: string
+    [key: string]: any
+  }
+  speaker?: {
+    id?: string
+    name?: string
+    [key: string]: any
+  }
+  text?: string
+  uploaded?: {
+    audioUrl?: string
+    duration?: number
+    [key: string]: any
+  } | null
+  [key: string]: any
+}
 
+// 定义组件状态接口
+interface ComponentState {
+  activeTab: string
+  textToAudioLoading: boolean
+}
+
+// 定义计算属性
+interface Getters {
+  isTextTab: ComputedRef<boolean>
+  isAudioTab: ComputedRef<boolean>
+}
+
+const select = defineModel<SelectState>({})
 
 const EDIT_TABS = {
   TEXT: '1',
   AUDIO: '2'
 }
 
-const state = reactive({
+const state = reactive<ComponentState>({
   activeTab: EDIT_TABS.TEXT,
   textToAudioLoading: false,
 })
 
-const listener = ref()
+const listener = ref<InstanceType<typeof EditListener> | null>(null)
 
-const getter = {
+const getter: Getters = {
   isTextTab: computed(() => {
     return state.activeTab === EDIT_TABS.TEXT
   }),
@@ -46,11 +78,10 @@ const getter = {
 }
 
 const action = {
-  onChangeTab() {
+  onChangeTab(): void {
     listener.value?.pause()
   }
 }
-
 </script>
 <style lang="less" scoped>
 .edit {
@@ -120,7 +151,6 @@ const action = {
         background-color: #161718;
       }
     }
-
   }
 }
 </style>

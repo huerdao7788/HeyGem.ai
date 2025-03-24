@@ -27,31 +27,71 @@
     </div>
   </div>
 </template>
-<script setup>
-import { reactive } from 'vue'
+<script setup lang="ts">
+import { reactive, PropType } from 'vue'
 import { MessagePlugin } from 'tdesign-vue-next'
 import EditTextSpeaker from './EditTextSpeaker.vue';
 import { useI18n } from 'vue-i18n'
 import { audition } from '@renderer/api'
+
+// 定义音色接口
+interface SpeakerInfo {
+  id?: string
+  name?: string
+  audioPath?: string
+  [key: string]: any
+}
+
+// 定义选择状态接口
+interface SelectState {
+  model?: {
+    id?: string
+    name?: string
+    [key: string]: any
+  }
+  speaker?: SpeakerInfo
+  text?: string
+  [key: string]: any
+}
+
+// 定义音频数据接口
+interface AudioData {
+  name: string
+  audioUrl: string
+  [key: string]: any
+}
+
+// 定义组件状态接口
+interface ComponentState {
+  popupVisible: boolean
+  textToAudioLoading: boolean
+}
+
+// 定义监听器接口
+interface Listener {
+  listen: (data: AudioData) => void
+  pause: () => void
+  [key: string]: any
+}
+
 const { t } = useI18n()
 
-const select = defineModel({})
+const select = defineModel<SelectState>({})
 
 const props = defineProps({
   listener: {
-    type: Object,
+    type: Object as PropType<Listener>,
     default: () => ({})
   }
 })
 
-
-const state = reactive({
+const state = reactive<ComponentState>({
   popupVisible: false,
   textToAudioLoading: false,
 })
 
 const action = {
-  async textToAudio() {
+  async textToAudio(): Promise<boolean | void> {
     const { speaker, text } = select.value || {}
     if (!speaker?.id) {
       await MessagePlugin.error('请选择音色')
@@ -73,17 +113,15 @@ const action = {
       })
     } catch (err) {
       console.error('文本转音频失败', err)
-      MessagePlugin.error(err.toString() || '试听失败')
+      MessagePlugin.error((err as Error).toString() || '试听失败')
     } finally {
       state.textToAudioLoading = false
     }
-
   },
-  onSelectSpeaker(speaker) {
+  onSelectSpeaker(speaker: SpeakerInfo): void {
     props.listener.pause()
   }
 }
-
 </script>
 <style lang="less">
 .speaker {
@@ -192,11 +230,9 @@ const action = {
           }
         }
       }
-
     }
   }
 }
-
 
 .popup-scoped {
   display: flex;
@@ -218,6 +254,5 @@ const action = {
   .wrap {
     flex: 1;
   }
-
 }
 </style>

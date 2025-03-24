@@ -19,7 +19,7 @@
   </div>
 
 </template>
-<script setup>
+<script setup lang="ts">
 import { reactive, onUnmounted, watchEffect } from 'vue'
 import { SearchIcon } from 'tdesign-icons-vue-next'
 import PlayIcon from '@renderer/assets/images/icons/icon-play.png'
@@ -28,7 +28,41 @@ import { voicePage } from '@renderer/api'
 import { MessagePlugin } from 'tdesign-vue-next'
 import { handlePath } from '@renderer/utils'
 
-const select = defineModel({})
+// 定义音色接口
+interface SpeakerInfo {
+  id?: string
+  name?: string
+  audioPath?: string
+  [key: string]: any
+}
+
+// 定义选择状态接口
+interface SelectState {
+  model?: {
+    id?: string
+    name?: string
+    [key: string]: any
+  }
+  speaker?: SpeakerInfo
+  text?: string
+  [key: string]: any
+}
+
+// 定义组件状态接口
+interface ComponentState {
+  search: string
+  playingId: string
+  status: number
+  speakerList: SpeakerInfo[]
+}
+
+// 定义响应接口
+interface VoicePageResponse {
+  list?: SpeakerInfo[]
+  total?: number
+}
+
+const select = defineModel<SelectState>({})
 
 const AUDIO_STATUS = {
   UNPLAY: 0,
@@ -53,18 +87,19 @@ const props = defineProps({
   }
 })
 
-const state = reactive({
+const state = reactive<ComponentState>({
   search: '',
   playingId: '',
   status: AUDIO_STATUS.UNPLAY,
   speakerList: []
 })
 
-
-const emit = defineEmits(['onSelect'])
+const emit = defineEmits<{
+  (e: 'onSelect', speaker: SpeakerInfo): void
+}>()
 
 const action = {
-  init() {
+  init(): void {
     watchEffect(async () => {
       if (props.popupVisible) {
         await action.searchList()
@@ -74,13 +109,13 @@ const action = {
       }
     })
   },
-  async searchList() {
+  async searchList(): Promise<void> {
     try {
       const result = await voicePage({
         name: state.search,
         page: 1,
         pageSize: 100
-      })
+      }) as VoicePageResponse
       state.speakerList = result.list || []
     } catch (err) {
       console.error('查询音色列表失败', err)
@@ -88,30 +123,30 @@ const action = {
     }
   },
   // 选中的音色滚动到中间
-  scrollToSelectSpeaker() {
+  scrollToSelectSpeaker(): void {
     const speakerId = select.value.speaker?.id
     if (speakerId) {
       const target = document.querySelector(`div[speaker-id="${speakerId}"]`)
       target?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
   },
-  selectSpeaker(speaker) {
+  selectSpeaker(speaker: SpeakerInfo): void {
     select.value.speaker = speaker
     emit('onSelect', speaker)
   },
 
-  stopAudio() {
+  stopAudio(): void {
     audio.pause()
     audio.currentTime = 0
     state.playingId = ''
   },
-  playAudio(speaker) {
+  playAudio(speaker: SpeakerInfo): void {
     audio.src = handlePath(speaker.audioPath)
     state.playingId = speaker.id
     audio.play()
   },
 
-  handlePlay(speaker) {
+  handlePlay(speaker: SpeakerInfo): void {
     action.selectSpeaker(speaker)
     if (!speaker.audioPath) {
       MessagePlugin.error(`未找到${speaker.name}的音频链接`)

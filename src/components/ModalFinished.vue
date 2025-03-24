@@ -43,7 +43,7 @@ import ImageSuccessSolid from '@renderer/assets/images/icons/icon-success-solid.
 
 // 定义组件属性接口
 interface ModalFinishedProps {
-  leftBtnText: string
+  leftBtnText?: string
   rightBtnText: string
 }
 

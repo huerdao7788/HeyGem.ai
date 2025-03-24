@@ -6,12 +6,21 @@
     </div>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
+import { PropType } from 'vue';
 import { Loading as TLoading } from 'tdesign-vue-next';
+
+// 定义模型接口
+interface ModelInfo {
+  id?: string
+  name?: string
+  videoPath?: string
+  [key: string]: any
+}
 
 defineProps({
   model: {
-    type: Object,
+    type: Object as PropType<ModelInfo>,
     default: () => ({})
   }
 })

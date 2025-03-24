@@ -20,13 +20,15 @@
         </t-content>
       </t-layout>
   </t-layout>
-  <ModalFinished ref="modalFinished" :right-btn-text="$t('common.selectView.modalFinishedObj.rightBtnText')">
+  <ModalFinished
+    ref="modalFinished"
+    :right-btn-text="$t('common.selectView.modalFinishedObj.rightBtnText')">
     {{ $t('common.selectView.modalFinishedObj.text1')
     }}<span style="color: #434af9"> {{ $t('common.selectView.modalFinishedObj.text2') }}</span>
     {{ $t('common.selectView.modalFinishedObj.text3') }}
   </ModalFinished>
 </template>
-<script setup>
+<script setup lang="ts">
 import { ref, reactive, watch } from "vue";
 import Header from './header/HeaderView.vue'
 import Select from './select/SelectView.vue'
@@ -37,14 +39,70 @@ import { saveVideo, makeVideo, findModel, findVideo, modelPage } from '@renderer
 import { useRoute, useRouter } from 'vue-router'
 import { MessagePlugin } from 'tdesign-vue-next'
 import { useI18n } from 'vue-i18n'
+
+// 定义模型接口
+interface ModelInfo {
+  id?: string
+  name?: string
+  videoPath?: string
+  voiceId?: string
+  audioPath?: string
+  [key: string]: any
+}
+
+// 定义音色接口
+interface SpeakerInfo {
+  id?: string
+  name?: string
+  audioPath?: string
+  [key: string]: any
+}
+
+// 定义上传的音频
+interface UploadedAudio {
+  audioUrl?: string
+  duration?: number
+  [key: string]: any
+}
+
+// 定义视频属性
+interface VideoInfo {
+  id: string
+  name: string
+  [key: string]: any
+}
+
+// 定义选择状态
+interface SelectState {
+  model: ModelInfo
+  speaker: SpeakerInfo
+  text: string
+  modelList: ModelInfo[]
+  uploaded: UploadedAudio | null
+  [key: string]: any
+}
+
+// 定义组件状态
+interface ComponentState {
+  initLoading: boolean
+  video: VideoInfo
+  select: SelectState
+}
+
+// 定义响应接口
+interface ModelPageResponse {
+  list?: ModelInfo[]
+  total?: number
+}
+
 const { t } = useI18n()
 
 const route = useRoute()
 const router = useRouter()
 
-const modalFinished = ref()
+const modalFinished = ref<InstanceType<typeof ModalFinished> | null>(null)
 
-const state = reactive({
+const state = reactive<ComponentState>({
   initLoading: false,
   video: {
     id: '',
@@ -60,7 +118,7 @@ const state = reactive({
 })
 
 const action = {
-  async init() {
+  async init(): Promise<void> {
     state.initLoading = true
     try {
       const { videoId, modelId } = route.query
@@ -68,7 +126,7 @@ const action = {
 
       // 初始化视频详情
       if (videoId) {
-        await action.initVideoDetail(videoId)
+        await action.initVideoDetail(videoId as string)
       }
 
       // 初始化模特列表
@@ -76,7 +134,7 @@ const action = {
 
       // 初始化模特详情
       if (modelId) {
-        state.select.model.id = modelId
+        state.select.model.id = modelId as string
       }
 
       if (!state.select.model.id) {
@@ -102,10 +160,10 @@ const action = {
   },
 
   //变更模特时，音色跟随变更
-  initWatchs() {
+  initWatchs(): void {
     watch(
       () => state.select.model,
-      async (model) => {
+      async (model: ModelInfo) => {
         if (model?.voiceId) {
           state.select.speaker = {
             id: model.voiceId,
@@ -116,13 +174,13 @@ const action = {
       }
     )
   },
-  async queryModelList(name = '') {
+  async queryModelList(name: string = ''): Promise<void> {
     try {
       const result = await modelPage({
         name,
         page: 1,
         pageSize: 100
-      })
+      }) as ModelPageResponse
 
       state.select.modelList = result.list || []
     } catch (error) {
@@ -131,11 +189,11 @@ const action = {
     }
   },
   // 选中的模特滚动到中间
-  scrollToSelectModel() {
+  scrollToSelectModel(): void {
     const target = document.querySelector(`div[model-id="${state.select.model.id}"]`)
     target?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   },
-  async initVideoDetail(videoId) {
+  async initVideoDetail(videoId: string): Promise<void> {
     const videoDetail = await findVideo(videoId)
     if (videoDetail) {
       state.video.id = videoDetail.id
@@ -144,11 +202,11 @@ const action = {
       state.select.model.id = videoDetail.modelId
     }
   },
-  async initModelDetail(modelId) {
+  async initModelDetail(modelId: string): Promise<void> {
     const modelDetail = await findModel(modelId)
     state.select.model = modelDetail
   },
-  check() {
+  check(): boolean {
     const { select, video } = state
     if (!select.model.id) {
       MessagePlugin.error(t('common.message.selectModelsTextError'))
@@ -164,13 +222,13 @@ const action = {
     }
     return true
   },
-  async submit() {
+  async submit(): Promise<void> {
     if (state.initLoading || !action.check()) return
     try {
       state.video.id = await action.save()
       const isOK = await action.make(state.video.id)
       if (isOK) {
-        const isToSee = await modalFinished.value.show()
+        const isToSee = await modalFinished.value?.show()
         isToSee ? router.push('/home') : window.location.reload()
       } else {
         throw new Error('合成视频失败')
@@ -180,18 +238,18 @@ const action = {
       MessagePlugin.error(t('common.message.videoSynthesisTextError'))
     }
   },
-  async save() {
-    if (state.initLoading) return
+  async save(): Promise<string> {
+    if (state.initLoading) return ''
     // modelId, name, text_content
     const { select, video } = state
 
-    const sumitAudio = {}
+    const sumitAudio: Record<string, any> = {}
     if (select.uploaded?.audioUrl && !select.text) {
       sumitAudio.audioPath = select.uploaded.audioUrl
     } else {
       sumitAudio.voiceId = select.speaker.id
     }
-    console.log('sumitAudio',sumitAudio)
+
     const saveId = await saveVideo({
       id: video.id,
       modelId: select.model.id,
@@ -201,7 +259,7 @@ const action = {
     })
     return video.id || saveId
   },
-  async make(videoId) {
+  async make(videoId: string): Promise<boolean> {
     const makeId = await makeVideo(videoId)
     return makeId === videoId
   }
@@ -247,6 +305,18 @@ action.init()
     align-items: unset;
 
     &>* {
+      height: 100%;
+    }
+
+    .content-left {
+      height: 100%;
+    }
+
+    .content-center {
+      height: 100%;
+    }
+
+    .content-right {
       height: 100%;
     }
   }

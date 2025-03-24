@@ -179,7 +179,7 @@ interface VideoItem {
   duration?: number
   progress?: number
   message?: string
-  createdAt?: string | number
+  createdAt?: string | Date
   [key: string]: any
 }
 
@@ -349,7 +349,7 @@ const downloadVideo = async (video: VideoItem): Promise<void> => {
     try {
       // 方式一：使用a标签的download属性强制下载
       const a = document.createElement('a')
-      a.href = video.filePath
+      a.href = handlePath(video.filePath)
       a.download = fileName
       a.style.display = 'none'
 

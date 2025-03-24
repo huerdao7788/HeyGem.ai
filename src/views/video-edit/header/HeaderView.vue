@@ -30,45 +30,59 @@
     </div>
   </div>
 </template>
-<script setup>
-import { reactive } from 'vue'
+<script setup lang="ts">
+import { reactive, PropType } from 'vue'
 import { ChevronLeftIcon, SaveIcon, Edit2Icon } from 'tdesign-icons-vue-next'
 import { useRouter } from 'vue-router'
 
+// 定义视频信息接口
+interface VideoInfo {
+  id?: string
+  name: string
+  [key: string]: any
+}
+
+// 定义组件状态接口
+interface ComponentState {
+  createLoading: boolean
+  saveLoading: boolean
+  isEditingName: boolean
+}
+
 const props = defineProps({
   onSubmit: {
-    type: Function,
+    type: Function as PropType<() => Promise<void>>,
     default: async () => {}
   },
   onSave: {
-    type: Function,
-    default: async () => {}
+    type: Function as PropType<() => Promise<string>>,
+    default: async () => ''
   }
 })
 
-const video = defineModel({})
+const video = defineModel<VideoInfo>({})
 
 const router = useRouter()
 
-const state = reactive({
+const state = reactive<ComponentState>({
   createLoading: false,
   saveLoading: false,
   isEditingName: false
 })
 
 const action = {
-  back() {
+  back(): void {
     router.back()
   },
-  toggleEditingName(isEditingName) {
+  toggleEditingName(isEditingName: boolean): void {
     state.isEditingName = isEditingName
   },
-  async toSaveVideo() {
+  async toSaveVideo(): Promise<void> {
     state.saveLoading = true
     await props.onSave()
     state.saveLoading = false
   },
-  async toCreateVideo() {
+  async toCreateVideo(): Promise<void> {
     state.createLoading = true
     await props.onSubmit()
     state.createLoading = false
