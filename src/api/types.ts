@@ -221,6 +221,17 @@ export namespace TtsApi {
     text: string;
     responseType?: string;
   }
+
+  // 语音识别
+  export interface TrainRequest {
+    file: File;
+  }
+
+  export interface TrainResponse {
+    success: boolean;
+    text: string;
+    message?: string;
+  }
 }
 
 // 文件相关类型

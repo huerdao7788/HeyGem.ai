@@ -41,3 +41,23 @@ export const voicePage = async (param: PageParams): Promise<VoiceApi.PageRespons
   const { data } = await request.get<VoiceApi.PageResponse>(`${apiUrl}/page?${searchParams}`);
   return data;
 };
+
+/**
+ * 删除语音
+ * @param id 语音ID
+ * @returns 删除结果
+ */
+export const voiceDelete = async (id: number): Promise<ApiResponse<null>> => {
+  const { data } = await request.delete<ApiResponse<null>>(`${apiUrl}/delete/${id}`);
+  return data;
+};
+
+/**
+ * 获取语音详情
+ * @param id 语音ID
+ * @returns 语音详情
+ */
+export const voiceFind = async (id: number): Promise<VoiceApi.FindResponse> => {
+  const { data } = await request.get<VoiceApi.FindResponse>(`${apiUrl}/find/${id}`);
+  return data;
+};

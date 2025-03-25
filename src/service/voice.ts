@@ -41,7 +41,7 @@ interface MakeAudioParams {
  * @param save
  * @returns 保存结果
  */
-export async function saveAudio(filePath: string,audioName: string, save: string): Promise<VoiceResult> {
+export async function saveAudio(filePath: string,audioName: string, save: string, audioText: string): Promise<VoiceResult> {
   // 创建FormData对象用于文件上传
   const formData = new FormData();
   try {
@@ -51,6 +51,7 @@ export async function saveAudio(filePath: string,audioName: string, save: string
     formData.append('file', file);
     formData.append('name', audioName);
     formData.append('save', save);
+    formData.append('audioText', audioText);
     const { id, audioPath } = await voiceSave(formData);
     return { id, audioPath };
   } catch (error) {

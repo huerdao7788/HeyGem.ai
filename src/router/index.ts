@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 import home from '@renderer/views/home/index.vue'
 import account from '@renderer/views/account/index.vue'
 import VideoEditView from '@renderer/views/video-edit/VideoEditView.vue'
+import VoiceManagement from '@renderer/views/voice-management/index.vue'
 
 // 定义路由记录
 const routes: Array<RouteRecordRaw> = [
@@ -24,6 +25,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/account',
     name: 'account',
     component: account
+  },
+  {
+    path: '/voice/management',
+    name: 'voiceManagement',
+    component: VoiceManagement
   },
 ]
 

@@ -104,7 +104,7 @@ export async function saveVideo(params: SaveVideoParams): Promise<string | numbe
   let finalAudioPath = audioPath;
 
   if (audioPath) {
-    let res = await saveAudio(audioPath, audioName,"false");
+    let res = await saveAudio(audioPath, audioName,"false","");
     finalAudioPath = res.audioPath;
   }
 

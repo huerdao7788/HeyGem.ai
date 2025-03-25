@@ -5,7 +5,8 @@
 // 中文翻译
 export const commonZh = {
   menu: {
-    text: '首页'
+    text: '首页',
+    voice: '音色管理'
   },
   header: {
     minimizeText: '最小化',
@@ -135,7 +136,8 @@ export const commonZh = {
 // 英文翻译
 export const commonEn = {
   menu: {
-    text: 'Home'
+    text: 'Home',
+    voice: 'Voice Management'
   },
   header: {
     minimizeText: 'Minimize',

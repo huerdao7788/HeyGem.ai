@@ -188,8 +188,8 @@ export function voicePage(
  * @param save
  * @returns 保存结果
  */
-export function voiceSave(path: string, audioName: string, save: string) {
-  return voiceService.saveAudio(path, audioName, save)
+export function voiceSave(path: string, audioName: string, save: string, audioText: string) {
+  return voiceService.saveAudio(path, audioName, save, audioText)
 }
 
 // 为了处理debug功能

@@ -163,7 +163,7 @@ const action = {
     state.audioLoading = true
     try {
       if (select.value.uploaded?.audioUrl) {
-        await voiceSave(select.value.uploaded.audioUrl,select.value.uploaded.name,"true")
+        await voiceSave(select.value.uploaded.audioUrl,select.value.uploaded.name,"true","")
       }
     } finally {
       state.audioLoading = false

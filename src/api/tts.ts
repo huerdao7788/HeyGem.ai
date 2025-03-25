@@ -14,3 +14,27 @@ export function makeAudio(param: TtsApi.InvokeRequest): Promise<ArrayBuffer> {
     responseType: 'arraybuffer'
   }) as unknown as Promise<ArrayBuffer>;
 }
+
+/**
+ * 语音内容识别
+ * @param file 音频文件
+ * @returns 识别结果
+ */
+export const train = async (file: File): Promise<TtsApi.TrainResponse> => {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  // 添加Content-Type头部配置用于FormData请求
+  const config = {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  };
+  // 调用本地识别接口
+  const { data } = await request.post(
+    `${apiUrl}/train`,
+    formData,
+    config
+  );
+  return data;
+};
