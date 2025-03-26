@@ -48,7 +48,7 @@ export const voicePage = async (param: PageParams): Promise<VoiceApi.PageRespons
  * @returns 删除结果
  */
 export const voiceDelete = async (id: number): Promise<ApiResponse<null>> => {
-  const { data } = await request.delete<ApiResponse<null>>(`${apiUrl}/delete/${id}`);
+  const { data } = await request.delete<ApiResponse<null>>(`${apiUrl}/del/${id}`);
   return data;
 };
 
