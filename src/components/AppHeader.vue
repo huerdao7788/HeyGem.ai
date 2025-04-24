@@ -161,7 +161,7 @@ const saveContextAjax = async (lang: string): Promise<void> => {
     height: 100%;
 
     .logo {
-      width: 110px;
+      width: 200px;
       height: 36px;
     }
   }
