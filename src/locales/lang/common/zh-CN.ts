@@ -1,0 +1,40 @@
+export default {
+  message: {
+    synthSuccessText: '合成成功',
+    synthErrorText: '合成失败',
+    audioLoadErrorText: '音频加载失败，请检查网络连接或重试',
+    audioPlayErrorText: '音频播放失败，请使用下载功能后在本地播放',
+    recordingCompleteText: '录音完成',
+    micAccessErrorText: '无法访问麦克风，请确保已授权',
+    uploadOrRecordVoiceText: '请上传或录制音频',
+    voiceCloneSuccessText: '语音克隆成功',
+    voiceCloneErrorText: '语音克隆失败',
+    selectedVoiceText: '已选择音色: {name}',
+    deleteSuccessText: '删除成功',
+    deleteErrorText: '删除失败',
+    voiceLoadErrorText: '加载音色列表失败',
+    noClonedVoicesText: '暂无克隆音色'
+  },
+  voiceSynthesis: {
+    playAudio: '播放音频',
+    download: '下载',
+    uploadAudio: '上传音频',
+    startRecord: '开始录音',
+    stopRecord: '停止录音',
+    voiceNamePlaceholder: '为您的音色命名（可选）',
+    sampleTextPlaceholder: '示例文本（用于预览音色）',
+    cloneVoice: '克隆音色',
+    clonedVoices: '我的克隆音色',
+    useVoice: '使用',
+    deleteVoice: '删除',
+    uploadVoice: '上传语音文件',
+    selectFile: '选择文件',
+    orRecord: '或录制语音',
+    recording: '正在录音...',
+    sampleText: '示例文本',
+    startCloning: '开始克隆',
+    use: '使用',
+    delete: '删除',
+    voiceName: '音色名称'
+  }
+}; 

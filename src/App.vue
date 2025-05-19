@@ -21,12 +21,13 @@ watch(
 )
 onMounted(() => {
   const language = localStorage.getItem('language')
-  if (language && language !== 'null') {
+  if (language && (language === 'zh' || language === 'en')) {
     locale.value = language
     home.setLanguage(language)
   } else {
     locale.value = 'zh'
     home.setLanguage('zh')
+    localStorage.setItem('language', 'zh')
   }
   saveContextAjax(home.homeState.language)
   getContextAjax()

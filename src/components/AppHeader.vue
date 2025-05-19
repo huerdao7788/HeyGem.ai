@@ -109,10 +109,12 @@ const action = {
       home.setAgreementVisible(true)
     } else {
       if (value === 'languageSwitch') return
-      window.localStorage.setItem('language', value)
-      locale.value = value
-      saveContextAjax(value)
-      home.setLanguage(value)
+      if (value === 'zh' || value === 'en') {
+        window.localStorage.setItem('language', value)
+        locale.value = value
+        saveContextAjax(value)
+        home.setLanguage(value)
+      }
     }
   }
 }

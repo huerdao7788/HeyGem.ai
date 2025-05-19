@@ -19,6 +19,8 @@ import activeIcon from '../assets/images/home/menu/active.svg'
 import offIcon from '../assets/images/home/menu/offHome.svg'
 import onVoiceIcon from '../assets/images/home/menu/onVoice.svg'
 import offVoiceIcon from '../assets/images/home/menu/offVoice.svg'
+import onVoiceSynthIcon from '../assets/images/home/menu/onVoiceSynth.svg'
+import offVoiceSynthIcon from '../assets/images/home/menu/offVoiceSynth.svg'
 import { useI18n } from 'vue-i18n'
 
 // 定义菜单项接口
@@ -56,6 +58,14 @@ const obj: MenuItem[] = [
     offIcon: offVoiceIcon,
     active: false,
     path: '/voice/management'
+  },
+  {
+    key: 'common.menu.voiceSynth',
+    name: t('common.menu.voiceSynth') || '语音合成',
+    onIcon: onVoiceSynthIcon,
+    offIcon: offVoiceSynthIcon,
+    active: false,
+    path: '/voice/synthesis'
   }
   /* {
       name: "账号",

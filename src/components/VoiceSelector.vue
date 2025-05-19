@@ -2,7 +2,7 @@
   <div class="voice-selector">
     <t-select
       v-model="selectedVoiceId"
-      :loading="voiceStore.loading"
+      :loading="loading"
       :placeholder="placeholder"
       :empty="emptyText"
       clearable
@@ -14,7 +14,7 @@
       </template>
 
       <t-option
-        v-for="item in voiceStore.voiceList"
+        v-for="item in voiceList"
         :key="item.id"
         :value="item.id"
         :label="item.name"
@@ -22,6 +22,7 @@
         <div class="voice-option">
           <span class="voice-name">{{ item.name }}</span>
           <audio
+            v-if="item.audioPath"
             class="voice-preview"
             :src="item.audioPath"
             controls
@@ -35,16 +36,9 @@
           <t-button
             theme="primary"
             variant="text"
-            @click.stop="showVoiceManagement"
-          >
-            管理音色
-          </t-button>
-          <t-button
-            theme="primary"
-            variant="text"
             @click.stop="refreshVoiceList"
           >
-            刷新列表
+            {{ refreshButtonText }}
           </t-button>
         </div>
       </template>
@@ -53,15 +47,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, defineProps, defineEmits } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
 import { AudioIcon } from 'tdesign-icons-vue-next';
-import { useRouter } from 'vue-router';
-import { useVoiceStore } from '@/stores/voice';
-import { Voice } from '@/api/types';
+import voiceApi from '@/api/voice/index';
+import { useI18n } from 'vue-i18n';
+
+// 使用国际化
+const { t } = useI18n();
 
 const props = defineProps({
   modelValue: {
-    type: Number,
+    type: [Number, String],
     default: undefined
   },
   placeholder: {
@@ -71,14 +67,22 @@ const props = defineProps({
   emptyText: {
     type: String,
     default: '暂无音色，请先添加'
+  },
+  refreshButtonText: {
+    type: String,
+    default: '刷新列表'
+  },
+  externalVoices: {
+    type: Array,
+    default: () => []
   }
 });
 
 const emit = defineEmits(['update:modelValue', 'change']);
 
-const router = useRouter();
-const voiceStore = useVoiceStore();
-const selectedVoiceId = ref<number | undefined>(props.modelValue);
+const loading = ref(false);
+const voiceList = ref<any[]>([]);
+const selectedVoiceId = ref<number | string | undefined>(props.modelValue);
 
 // 监听外部传入的值变化
 watch(() => props.modelValue, (newVal) => {
@@ -97,18 +101,92 @@ onMounted(() => {
 
 // 刷新音色列表
 const refreshVoiceList = async () => {
-  await voiceStore.fetchVoiceList();
+  loading.value = true;
+  try {
+    // 获取克隆的音色
+    const clonedVoices = voiceApi.getClonedVoices();
+    
+    // 将克隆的音色格式化为选项
+    const clonedOptions = clonedVoices.map(voice => ({
+      id: voice.voiceId,
+      name: `${voice.name} (${t('common.voiceSynthesis.voiceCloning')})`,
+      audioPath: voice.sampleUrl,
+      isCloned: true
+    }));
+    
+    // 获取系统音色
+    let systemVoices: any[] = [];
+    
+    // 优先使用外部传入的音色列表
+    if (props.externalVoices && props.externalVoices.length > 0) {
+      systemVoices = props.externalVoices;
+    } else {
+      try {
+        const voices = await voiceApi.getSystemVoices();
+        console.log('获取到系统音色:', voices);
+
+        // 处理MiniMax官方音色格式
+        systemVoices = voices.map((voice: any) => {
+          // 尝试解析voice_id或id
+          const voiceId = voice.voice_id || voice.id || voice.voiceId || '';
+          
+          // 由于不存在预览音频，使用null作为默认值
+          const previewUrl = voice.sampleUrl || voice.audioUrl || null;
+          
+          return {
+            id: voiceId,
+            name: formatVoiceName(voice),
+            audioPath: previewUrl,
+            isSystem: true,
+            // 保存原始数据，便于调试
+            original: voice
+          };
+        });
+      } catch (error) {
+        console.error('获取系统音色列表失败:', error);
+      }
+    }
+    
+    // 合并音色列表
+    voiceList.value = [...clonedOptions, ...systemVoices];
+  } catch (error) {
+    console.error('刷新音色列表错误:', error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+// 格式化音色名称，显示更友好的名称
+const formatVoiceName = (voice: any): string => {
+  // 获取名称
+  const name = voice.name || voice.displayName || '';
+  
+  // 尝试获取语言和性别信息
+  const tags = voice.tags || [];
+  const language = voice.language || tags.find((tag: string) => ['中文', '英文', '日语', '韩语'].includes(tag)) || '';
+  const gender = voice.gender || '';
+  
+  let formattedName = name;
+  
+  // 为音色名称添加更多信息
+  let genderText = '';
+  if (gender === 'male') {
+    genderText = t('common.voiceSynthesis.male');
+  } else if (gender === 'female') {
+    genderText = t('common.voiceSynthesis.female');
+  }
+  
+  if (language || genderText) {
+    formattedName += ` (${language}${genderText ? ' ' + genderText : ''})`;
+  }
+  
+  return formattedName;
 };
 
 // 处理音色变更
-const handleVoiceChange = (value: number) => {
-  const selectedVoice = voiceStore.voiceList.find(item => item.id === value);
+const handleVoiceChange = (value: number | string) => {
+  const selectedVoice = voiceList.value.find(item => item.id === value);
   emit('change', selectedVoice);
-};
-
-// 跳转到音色管理页面
-const showVoiceManagement = () => {
-  router.push('/voice/management');
 };
 </script>
 
@@ -135,7 +213,7 @@ const showVoiceManagement = () => {
 
 .voice-footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   padding: 8px 0;
   border-top: 1px solid #e7e7e7;
 }

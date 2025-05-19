@@ -1,0 +1,40 @@
+export default {
+  message: {
+    synthSuccessText: 'Synthesis successful',
+    synthErrorText: 'Synthesis failed',
+    audioLoadErrorText: 'Audio loading failed, please check network connection or try again',
+    audioPlayErrorText: 'Audio playback failed, please use download function and play locally',
+    recordingCompleteText: 'Recording complete',
+    micAccessErrorText: 'Could not access microphone, please ensure permission is granted',
+    uploadOrRecordVoiceText: 'Please upload or record audio',
+    voiceCloneSuccessText: 'Voice cloning successful',
+    voiceCloneErrorText: 'Voice cloning failed',
+    selectedVoiceText: 'Voice selected: {name}',
+    deleteSuccessText: 'Delete successful',
+    deleteErrorText: 'Delete failed',
+    voiceLoadErrorText: 'Failed to load voice list',
+    noClonedVoicesText: 'No cloned voices yet'
+  },
+  voiceSynthesis: {
+    playAudio: 'Play Audio',
+    download: 'Download',
+    uploadAudio: 'Upload Audio',
+    startRecord: 'Start Recording',
+    stopRecord: 'Stop Recording',
+    voiceNamePlaceholder: 'Name your voice (optional)',
+    sampleTextPlaceholder: 'Sample text (to preview voice)',
+    cloneVoice: 'Clone Voice',
+    clonedVoices: 'My Cloned Voices',
+    useVoice: 'Use',
+    deleteVoice: 'Delete',
+    uploadVoice: 'Upload Voice File',
+    selectFile: 'Select File',
+    orRecord: 'Or Record Voice',
+    recording: 'Recording...',
+    sampleText: 'Sample Text',
+    startCloning: 'Start Cloning',
+    use: 'Use',
+    delete: 'Delete',
+    voiceName: 'Voice Name'
+  }
+}; 
